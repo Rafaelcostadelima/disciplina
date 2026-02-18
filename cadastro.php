@@ -1,9 +1,9 @@
 <?php
 // Configuração e Conexão
-$host = 'localhost';
+$host = 'sql109.infinityfree.com';
 $db   = 'disciplina_db';
-$user = 'root';
-$pass = '';
+$user = 'if0_41191734';
+$pass = '0509rafita';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
