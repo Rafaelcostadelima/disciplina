@@ -1,0 +1,1 @@
+Este é um site onde haverá uma tela onde você pode adicionar as suas metas diárias e semanais. Quando você completar uma ou mais tarefas, receberá as suas recompensas sem culpa. O próprio usuário definirá as metas e suas recompensas.
