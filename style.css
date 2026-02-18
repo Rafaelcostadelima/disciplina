@@ -1,0 +1,218 @@
+:root {
+    --primary-color: rgb(232, 122, 18); /* O Laranja solicitado */
+    --bg-color: #121212; /* Preto fundo */
+    --card-bg: #1e1e1e; /* Preto card/nav */
+    --text-color: #ffffff;
+    --text-muted: #b0b0b0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* --- NAVBAR RESPONSIVA --- */
+header {
+    background-color: var(--card-bg);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+/* O que a IA fez */
+/* .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-decoration: none;
+    letter-spacing: 1px;
+} */
+
+/* Correção do tamanho da Logo */
+.logo {
+    display: flex; /* Garante que o link se ajuste à imagem */
+    align-items: center;
+}
+
+.logo img {
+    height: 50px; /* Reduzi de 90px para 50px (tamanho padrão de menu) */
+    width: auto;  /* Mantém a proporção correta */
+    object-fit: contain; /* Garante que a imagem não distorça */
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    color: var(--primary-color);
+}
+
+/* Botão de Login na Nav */
+.btn-login-nav {
+    border: 1px solid var(--primary-color);
+    padding: 8px 20px;
+    border-radius: 5px;
+    color: var(--primary-color) !important;
+}
+
+.btn-login-nav:hover {
+    background-color: var(--primary-color);
+    color: white !important;
+}
+
+/* Menu Hamburguer (Mobile) */
+.hamburger {
+    display: none;
+    cursor: pointer;
+}
+
+.bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px auto;
+    background-color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+/* --- TELA DE LOGIN --- */
+.login-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 60px; /* Espaço da navbar */
+}
+
+.login-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(232, 122, 18, 0.15); /* Sombra laranja sutil */
+    text-align: center;
+    border-top: 4px solid var(--primary-color);
+}
+
+.login-card h2 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.input-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #333;
+    background-color: #2a2a2a;
+    color: white;
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--primary-color);
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: rgb(190, 100, 15);
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 768px) {
+    .hamburger {
+        display: block;
+    }
+
+    .hamburger.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+    .hamburger.active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .hamburger.active .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+
+    .nav-links {
+        position: fixed;
+        left: -100%;
+        top: 82px;
+        gap: 0;
+        flex-direction: column;
+        background-color: var(--card-bg);
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        box-shadow: 0 10px 10px rgba(0,0,0,0.5);
+    }
+
+    .nav-links.active {
+        left: 0;
+    }
+
+    .nav-links li {
+        margin: 16px 0;
+    }
+}
+
+/* Ajuste para telas pequenas quando o formulário é grande */
+@media (max-height: 800px) {
+    .login-container {
+        height: auto; /* Remove a altura fixa de 100vh */
+        min-height: 100vh;
+        padding-bottom: 50px; /* Dá um espaço em baixo */
+    }
+}
