@@ -4,6 +4,7 @@
     --card-bg: #1e1e1e; /* Preto card/nav */
     --text-color: #ffffff;
     --text-muted: #b0b0b0;
+    --text-desatived: gray;
 }
 
 * {
@@ -68,6 +69,14 @@ nav {
     color: var(--text-color);
     font-weight: 500;
     transition: color 0.3s;
+}
+
+.desativado{
+    color: var(--text-desatived) !important;
+}
+
+.desativado:hover{
+    cursor: not-allowed;
 }
 
 .nav-links a:hover, .nav-links a.active {
@@ -216,3 +225,242 @@ nav {
         padding-bottom: 50px; /* Dá um espaço em baixo */
     }
 }
+
+/* --- ESTILOS DO DROPDOWN (PERFIL) --- */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    height: 100%; /* Garante altura total na nav */
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    /* Truque do Buraco: Borda transparente invisível conecta o botão ao menu */
+    border-top: 15px solid transparent; 
+    top: 100%; /* Cola exatamente embaixo do botão */
+    
+    /* O fundo e a sombra agora aplicam no "pseudo-elemento" ou nas tags A, 
+       mas para simplificar, vamos ajustar o background aqui e usar background-clip */
+    background-color: var(--card-bg);
+    background-clip: padding-box; /* Faz a cor não vazar na borda transparente */
+    
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+    z-index: 100;
+    border-radius: 5px;
+    border: 1px solid #333;
+    /* REMOVIDO: margin-top: 10px; (Isso que causava o bug) */
+}
+
+/* MOSTRAR: Funciona com Hover (Mouse) OU com a classe .show (Clique) */
+.dropdown:hover .dropdown-content, .dropdown-content.show {
+    display: block;
+}
+
+.dropdown-content a {
+    color: var(--text-color);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.9rem;
+}
+
+.dropdown-content a:hover {
+    background-color: #333;
+    color: var(--primary-color);
+}
+
+/* --- A SETA CHEVRON (< vira ^) --- */
+.arrow {
+    border: solid white;
+    border-width: 0 2px 2px 0; /* Desenha um L */
+    display: inline-block;
+    padding: 3px;
+    margin-left: 8px;
+    margin-bottom: 2px;
+    transition: transform 0.3s ease; /* Animação suave */
+    
+    /* Estado Inicial: Apontando para baixo (45 graus) */
+    transform: rotate(45deg); 
+    -webkit-transform: rotate(45deg);
+}
+
+/* Quando passar o mouse no menu OU quando estiver clicado (.show), a seta gira */
+.dropdown:hover .arrow, .show + .dropdown-content ~ .arrow { 
+    /* Estado Aberto: Apontando para cima */
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    margin-bottom: -2px; /* Pequeno ajuste ótico */
+}
+
+/* Ajuste específico para quando o JS ativa a classe .show na div, precisamos girar a seta no link */
+/* Como o JS não adiciona classe no link, vamos confiar no Hover do CSS para girar,
+   ou podemos adicionar uma linha no JS para girar. 
+   Por enquanto, o hover já vai dar o efeito visual que você quer 99% das vezes. */
+
+/* Mostra o menu quando passa o mouse (Desktop) ou clica (Mobile) */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* --- ESTILOS DO MODAL (JANELA) --- */
+.modal {
+    display: none; /* Escondido por padrão */
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8); /* Fundo escuro transparente */
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #444;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(232, 122, 18, 0.2);
+    position: relative;
+    animation: modalFadeIn 0.3s;
+}
+
+@keyframes modalFadeIn {
+    from {top: -50px; opacity: 0;}
+    to {top: 0; opacity: 1;}
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: white;
+}
+
+/* Estilo do Select e Input dentro do Modal */
+.modal-form select, .modal-form input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 5px;
+    outline: none;
+}
+
+/* --- BOTÃO IMPORTANTE (Laranja Claro) --- */
+.btn-importante {
+    display: block; /* Ocupa linha inteira ou bloco */
+    width: 100%;
+    max-width: 200px;
+    margin: 40px auto 20px auto; /* Centralizado no final */
+    padding: 15px;
+    background-color: rgb(255, 150, 50); /* Laranja mais claro */
+    color: #121212; /* Texto escuro para contraste */
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    border-radius: 30px; /* Borda bem redonda */
+    cursor: pointer;
+    transition: transform 0.2s;
+    text-decoration: none;
+}
+
+.btn-importante:hover {
+    transform: scale(1.05);
+    background-color: rgb(255, 170, 80);
+}
+
+/* --- CONSERTO DO BOTÃO IMPORTANTE --- */
+.btn-importante {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    /* Aumentei a margem superior para 60px para desgrudar dos cards */
+    margin: 60px auto 40px auto; 
+    padding: 15px;
+    background-color: rgb(255, 150, 50);
+    color: #121212;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Sombra para dar destaque */
+}
+
+.btn-importante:hover {
+    transform: scale(1.05);
+    background-color: rgb(255, 170, 80);
+}
+
+/* --- CONSERTO DA MODAL (Para não parecer footer) --- */
+.modal {
+    display: none; /* OBRIGATÓRIO: Começa escondido */
+    position: fixed; /* OBRIGATÓRIO: Flutua na tela, ignora o resto */
+    z-index: 9999; /* Fica em cima de tudo */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Fundo preto transparente */
+    backdrop-filter: blur(5px); /* Efeito de desfoque no fundo */
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    margin: 10vh auto; /* 10% do topo */
+    padding: 30px;
+    border: 1px solid #444;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    position: relative;
+    animation: descerSuave 0.4s;
+}
+
+@keyframes descerSuave {
+    from {transform: translateY(-50px); opacity: 0;}
+    to {transform: translateY(0); opacity: 1;}
+}
+
+/* Formatação interna da Modal */
+.modal-form label {
+    display: block;
+    margin-top: 15px;
+    color: #ccc;
+}
+
+.modal-form select, .modal-form input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    background-color: #222;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 5px;
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover { color: white; }

@@ -69,16 +69,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crie sua Conta - Disciplina Total</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="img/logodt.png" type="image/x-icon">
 </head>
 <body>
 
     <header>
         <nav>
-            <a href="index.php" class="logo"><img src="img/logodt.png" alt="Logo DT"></a>
+            <a href="dashboard.php" class="logo"><img src="img/logodt.png" alt="Logo DT"></a>
+
             <ul class="nav-links">
-                <li><a href="index.php">Início</a></li>
+                <li><a href="#" class="desativado">Minhas Metas</a></li>
+                <li><a href="#" class="desativado">Desempenho</a></li>
+
+                <!-- DROPDOWN PERFIL -->
+                <li class="dropdown">
+                    <!-- Adicionei a classe "arrow" aqui dentro -->
+                    <a href="javascript:void(0)" id="btnPerfil" class="dropbtn desativado">
+                        Perfil
+                    </a>
+                </li>
                 <li><a href="index.php" class="btn-login-nav">Login</a></li>
             </ul>
+
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
         </nav>
     </header>
 

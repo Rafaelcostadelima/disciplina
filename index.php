@@ -2,7 +2,7 @@
 session_start();
 
 $host = 'localhost';
-$db   = 'disciplina_db';
+$db = 'disciplina_db';
 $user = 'root';
 $pass = '';
 
@@ -28,9 +28,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Sucesso
         $_SESSION['usuario_nome'] = $usuario['nome'];
         $_SESSION['usuario_id'] = $usuario['id'];
-        
+
         // Redireciona para Dashboard (ainda não criamos, então vai pra ele mesmo com sucesso)
-        // header("Location: dashboard.php");
+        if ($usuario && $usuario['senha'] == $senha) {
+            // Sucesso
+            $_SESSION['usuario_nome'] = $usuario['nome'];
+            $_SESSION['usuario_id'] = $usuario['id'];
+
+            header("Location: dashboard.php"); // AGORA VAI PRO DASHBOARD!
+            exit;
+        }
         $_SESSION['msg_sucesso'] = "Login realizado com sucesso! Bem-vindo " . $usuario['nome'];
         header("Location: index.php"); // Recarrega para limpar o POST
         exit;
@@ -45,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,18 +60,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="img/logodt.png" type="image/x-icon">
 </head>
+
 <body>
 
     <header>
         <nav>
-            <a href="#" class="logo"><img src="img/logodt.png" alt="Logo DT"></a>
+            <a href="dashboard.php" class="logo"><img src="img/logodt.png" alt="Logo DT"></a>
+
             <ul class="nav-links">
-                <li><a href="#">Início</a></li>
-                <li><a href="#">Gráficos</a></li>
-                <li><a href="#">Perfil</a></li>
-                <li><a href="cadastro.php" class="btn-login-nav">Login</a></li>
+                <li><a href="#" class="desativado">Minhas Metas</a></li>
+                <li><a href="#" class="desativado">Desempenho</a></li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" id="btnPerfil" class="dropbtn desativado">
+                        Perfil
+                    </a>
+                </li>
+                <li><a href="cadastro.php" class="btn-login-nav">Registre-se</a></li>
             </ul>
-             <div class="hamburger">
+
+            <div class="hamburger">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -74,9 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <main class="login-container">
         <div class="login-card">
             <h2>Acesse sua conta</h2>
-            
+
             <!-- Mensagem de Sucesso (se houver) -->
-            <?php if(isset($_SESSION['msg_sucesso'])): ?>
+            <?php if (isset($_SESSION['msg_sucesso'])): ?>
                 <p style="color: green; margin-bottom: 10px;">
                     <?= $_SESSION['msg_sucesso']; ?>
                 </p>
@@ -94,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <!-- MENSAGEM DE ERRO (Agora entre a senha e o botão) -->
-                <?php if(isset($_SESSION['msg_erro'])): ?>
+                <?php if (isset($_SESSION['msg_erro'])): ?>
                     <p style="color: red; font-size: 0.9rem; margin-top: 5px; margin-bottom: 5px;">
                         <?= $_SESSION['msg_erro']; ?>
                     </p>
@@ -103,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <button type="submit" class="btn-submit">ENTRAR</button>
             </form>
-            
+
             <p style="margin-top: 15px; font-size: 0.8rem; color: #b0b0b0;">
                 Ainda não tem conta? <a href="cadastro.php" style="color: var(--primary-color);">Registre-se</a>
             </p>
@@ -112,4 +127,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="script.js"></script>
 </body>
+
 </html>
