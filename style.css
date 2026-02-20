@@ -464,3 +464,289 @@ nav {
 }
 
 .close-btn:hover { color: white; }
+
+/* --- SELETOR DE DIAS DA SEMANA --- */
+.dias-semana-wrapper {
+    display: flex;
+    justify-content: space-between;
+    margin: 15px 0;
+    gap: 5px;
+}
+
+/* Esconde o checkbox padrão feio */
+.dias-semana-wrapper input[type="checkbox"] {
+    display: none;
+}
+
+/* O visual do botão do dia */
+.dias-semana-wrapper label {
+    flex: 1;
+    padding: 10px 0;
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 5px;
+    color: #888;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+/* Quando o checkbox está marcado (Checked), muda a cor */
+.dias-semana-wrapper input[type="checkbox"]:checked + label {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    font-weight: bold;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(232, 122, 18, 0.4);
+}
+
+/* Input de minutos personalizado */
+.input-minutos {
+    font-size: 1.5rem !important;
+    text-align: center;
+    color: var(--primary-color) !important;
+    font-weight: bold;
+}
+
+/* --- HEADER DASHBOARD (Alinha saudação e pontos) --- */
+.header-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+/* --- EMBLEMA DT POINTS --- */
+.dt-points-badge {
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 20px;
+    padding: 5px 15px 5px 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.coin-icon {
+    width: 30px;
+    height: 30px;
+    background-color: gold; /* COR DE FUNDO (Futura imagem) */
+    border-radius: 50%;
+    /* Para colocar sua imagem depois, use: 
+       background-image: url('caminho/moeda.png'); 
+       background-size: cover; 
+    */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5); /* Efeito 3D simples */
+}
+
+.points-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+}
+
+.points-label {
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* --- SISTEMA DE ABAS (Estilo Navegador) --- */
+.tabs-container {
+    margin-top: 20px;
+}
+
+.tabs-header {
+    display: flex;
+    gap: 5px;
+    border-bottom: 2px solid var(--primary-color); /* Linha laranja embaixo das abas */
+}
+
+.tab-btn {
+    background-color: #2a2a2a;
+    border: none;
+    color: #888;
+    padding: 10px 25px;
+    border-radius: 10px 10px 0 0; /* Arredonda só em cima */
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    font-size: 1rem;
+}
+
+.tab-btn:hover {
+    background-color: #333;
+    color: white;
+}
+
+.tab-btn.active {
+    background-color: var(--primary-color); /* Laranja na aba ativa */
+    color: white;
+    transform: translateY(2px); /* Desce um pouquinho pra cobrir a linha */
+}
+
+/* --- CONTEÚDO DAS ABAS (Tasks) --- */
+.tab-content {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: 0 0 10px 10px; /* Arredonda só embaixo */
+    border: 1px solid #333;
+    border-top: none; /* Remove borda de cima pra juntar com a aba */
+    min-height: 200px;
+}
+
+/* Cards das Tarefas */
+.task-card {
+    background-color: #252525;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #444;
+    transition: transform 0.2s;
+}
+
+.task-card:hover {
+    transform: translateX(5px);
+    border-left-color: var(--primary-color);
+}
+
+.task-info h4 {
+    margin: 0;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.task-info p {
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+    color: #bbb;
+}
+
+.faded {
+    opacity: 0.7; /* Tarefas da semana ficam mais apagadinhas */
+}
+
+.dias-badge {
+    background-color: #111;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem !important;
+    color: var(--primary-color) !important;
+    display: inline-block;
+}
+
+/* Botão de Check */
+.btn-check {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid #555;
+    background: transparent;
+    color: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.btn-check:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* Botão Nova Tarefa na Lista */
+.btn-add-task {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    background-color: transparent;
+    border: 2px dashed #444;
+    color: #888;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn-add-task:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: rgba(232, 122, 18, 0.1);
+}
+
+/* --- ESTILOS DA SEMANA (Separada por dias) --- */
+
+.day-group {
+    padding: 10px 0;
+}
+
+.day-header {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge-hoje {
+    background-color: white;
+    color: black;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.text-muted-small {
+    color: #555;
+    font-size: 0.9rem;
+    font-style: italic;
+    padding-left: 10px;
+}
+
+.text-muted-center {
+    color: #777;
+    text-align: center;
+    padding: 20px;
+}
+
+.divider-week {
+    border: 0;
+    border-top: 1px solid #333;
+    margin: 15px 0;
+}
+
+/* --- ALERTA DE HÁBITOS NÃO FEITOS --- */
+.missed-alert {
+    background-color: rgba(255, 0, 0, 0.1); /* Fundo vermelho bem fraquinho */
+    border-left: 3px solid #ff4444;
+    color: #ff8888;
+    padding: 10px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.opacity-low {
+    opacity: 0.5; /* Deixa as tarefas perdidas meio apagadas */
+}
+
+.task-card-mini {
+    display: flex;
+    justify-content: space-between;
+    background-color: #1a1a1a;
+    padding: 8px 12px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #aaa;
+}
