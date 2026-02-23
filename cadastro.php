@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="dashboard.php" class="logo"><img src="img/logodt.png" alt="Logo DT"></a>
 
             <ul class="nav-links">
-                <li><a href="#" class="desativado">Minhas Metas</a></li>
+                <li><a href="#" class="desativado">Minhas Rotina</a></li>
                 <li><a href="#" class="desativado">Desempenho</a></li>
 
                 <!-- DROPDOWN PERFIL -->

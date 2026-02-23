@@ -44,21 +44,86 @@ if (btnPerfil && myDropdown) {
    3. GERENCIAMENTO DAS MODAIS (META E IMPORTANTE)
    ================================================================== */
 
-// --- MODAL NOVA META ---
+/* ==================================================================
+   GERENCIAMENTO DA MODAL DE ROTINA (CRIAR E EDITAR)
+   ================================================================== */
 const modalMeta = document.getElementById("modalMeta");
-const btnNovaMeta = document.getElementById("btnNovaMeta");
-// Selecionamos o botão de fechar específico de dentro da modal meta
+const formRotina = document.getElementById("formRotina");
+const modalTitulo = document.getElementById("modalTitulo");
+const btnSalvarRotina = document.getElementById("btnSalvarRotina");
+const inputIdRotina = document.getElementById("inputIdRotina");
+const inputTipoMeta = document.getElementById("tipoMeta");
+const inputPersonalizado = document.getElementById("metaTexto");
+const divPersonalizado = document.getElementById("inputPersonalizado");
+const inputMinutosMeta = document.getElementById("inputMinutos");
+const checkboxesDias = document.querySelectorAll('input[name="dias[]"]');
 const closeMeta = modalMeta ? modalMeta.querySelector(".close-btn") : null;
 
-if (btnNovaMeta && modalMeta) {
-  btnNovaMeta.onclick = function () {
+// Botões que abrem a modal para CRIAR (existem 2, um em cada aba)
+const btnsCriar = document.querySelectorAll(".btn-add-task");
+
+// 1. FUNÇÃO PARA ABRIR EM MODO "CRIAR"
+if (btnsCriar) {
+    btnsCriar.forEach(btn => {
+        btn.onclick = function() {
+            resetarModal(); // Limpa tudo
+            modalMeta.style.display = "block";
+        }
+    });
+}
+
+// 2. FUNÇÃO PARA ABRIR EM MODO "EDITAR" (Chamada pelo botão lápis no PHP)
+function abrirModalEditar(id, tipo, desc, duracao, diasString) {
+    resetarModal(); // Limpa antes de preencher
+    
+    // Muda visual para "Edição"
+    modalTitulo.innerText = "Editar Rotina";
+    btnSalvarRotina.innerText = "ATUALIZAR ROTINA";
+    formRotina.action = "atualizar_rotina.php"; // Aponta para o arquivo de update
+    inputIdRotina.value = id; // Define o ID escondido
+
+    // Preenche os campos
+    inputTipoMeta.value = tipo;
+    inputMinutosMeta.value = duracao;
+    
+    // Se for personalizado, mostra o campo
+    if (tipo === 'outro') {
+        divPersonalizado.style.display = "block";
+        inputPersonalizado.value = desc;
+    } else {
+        divPersonalizado.style.display = "none";
+    }
+
+    // Marca os dias da semana
+    // diasString vem como "Seg,Qua,Sex"
+    const diasArray = diasString.split(',');
+    checkboxesDias.forEach(chk => {
+        if (diasArray.includes(chk.value)) {
+            chk.checked = true;
+        }
+    });
+
+    // Atualiza preview de pontos
+    const event = new Event('input');
+    inputMinutosMeta.dispatchEvent(event); // Força o recálculo dos pontos
+
     modalMeta.style.display = "block";
-  };
-  if (closeMeta) {
-    closeMeta.onclick = function () {
-      modalMeta.style.display = "none";
-    };
-  }
+}
+
+// Função auxiliar para limpar a modal
+function resetarModal() {
+    formRotina.reset(); // Limpa inputs
+    modalTitulo.innerText = "Configurar Rotina";
+    btnSalvarRotina.innerText = "CRIAR ROTINA";
+    formRotina.action = "salvar_rotina.php"; // Volta para o arquivo de salvar
+    inputIdRotina.value = "";
+    divPersonalizado.style.display = "none";
+    document.getElementById("pontosPreview").innerText = "0";
+}
+
+// Fechar Modal
+if (closeMeta) {
+    closeMeta.onclick = () => modalMeta.style.display = "none";
 }
 
 // --- MODAL IMPORTANTE ---
@@ -214,10 +279,24 @@ if (modalConfirm) {
     cancelConfirm.onclick = () => (modalConfirm.style.display = "none");
 }
 
-// Adicionar ao fechar global (window.onclick)
-// ATENÇÃO: Adicione isso dentro do seu window.onclick existente!
-/*
-    if (modalConfirm && event.target == modalConfirm) {
-        modalConfirm.style.display = "none";
+/* ==================================================================
+   MODAL DE EXCLUSÃO (LIXEIRA)
+   ================================================================== */
+const modalDelete = document.getElementById("modalDelete");
+const btnConfirmarDelete = document.getElementById("btnConfirmarDelete");
+const fecharDelete = document.getElementById("fecharDelete");
+const btnCancelarDelete = document.getElementById("btnCancelarDelete");
+
+function abrirModalDelete(idRotina) {
+    if (modalDelete && btnConfirmarDelete) {
+        // Atualiza o link do botão vermelho com o ID certo
+        btnConfirmarDelete.href = "excluir_rotina.php?id=" + idRotina;
+        modalDelete.style.display = "block";
     }
-*/
+}
+
+// Fechar modal de delete
+if (modalDelete) {
+    if(fecharDelete) fecharDelete.onclick = () => modalDelete.style.display = "none";
+    if(btnCancelarDelete) btnCancelarDelete.onclick = () => modalDelete.style.display = "none";
+}
