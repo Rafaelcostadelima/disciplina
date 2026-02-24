@@ -1,302 +1,316 @@
 /* ==================================================================
-   1. MENU MOBILE (HAMBURGUER)
+   SCRIPT UNIFICADO - DISCIPLINA APP
    ================================================================== */
+
+/* ------------------------------------------------------------------
+   1. SELETORES GLOBAIS (Para evitar erros de elemento não encontrado)
+   ------------------------------------------------------------------ */
+// Menu
 const hamburger = document.querySelector(".hamburger");
 const navMenu = document.querySelector(".nav-links");
-
-if (hamburger && navMenu) {
-  hamburger.addEventListener("click", () => {
-    hamburger.classList.toggle("active");
-    navMenu.classList.toggle("active");
-  });
-
-  // Fecha o menu ao clicar em um link
-  document.querySelectorAll(".nav-links a").forEach((n) =>
-    n.addEventListener("click", () => {
-      hamburger.classList.remove("active");
-      navMenu.classList.remove("active");
-    }),
-  );
-}
-
-/* ==================================================================
-   2. DROPDOWN DO PERFIL (CLIQUE)
-   ================================================================== */
 const btnPerfil = document.getElementById("btnPerfil");
 const myDropdown = document.getElementById("myDropdown");
 const arrowIcon = document.querySelector(".arrow");
 
-if (btnPerfil && myDropdown) {
-  btnPerfil.addEventListener("click", function (e) {
-    e.preventDefault(); // Impede a página de pular
-    myDropdown.classList.toggle("show");
+// Modais Principais
+const modalMeta = document.getElementById("modalMeta");         // Criar/Editar Rotina
+const modalImportante = document.getElementById("modalImportante");
+const modalGamificacao = document.getElementById("modalGamificacao");
+const modalConfirm = document.getElementById("modalConfirmacao"); // Check
+const modalDelete = document.getElementById("modalDelete");       // Lixeira
+const modalRecompensa = document.getElementById("modalRecompensa"); // Criar Item Loja
+const modalCompra = document.getElementById("modalCompra");       // Comprar Item
 
-    // Gira a setinha
-    if (myDropdown.classList.contains("show")) {
-      if (arrowIcon) arrowIcon.style.transform = "rotate(-135deg)";
-    } else {
-      if (arrowIcon) arrowIcon.style.transform = "rotate(45deg)";
-    }
-  });
+/* ------------------------------------------------------------------
+   2. NAVEGAÇÃO (MOBILE & DROPDOWN)
+   ------------------------------------------------------------------ */
+if (hamburger && navMenu) {
+    hamburger.addEventListener("click", () => {
+        hamburger.classList.toggle("active");
+        navMenu.classList.toggle("active");
+    });
+    // Fecha ao clicar num link
+    document.querySelectorAll(".nav-links a").forEach(n => n.addEventListener("click", () => {
+        hamburger.classList.remove("active");
+        navMenu.classList.remove("active");
+    }));
 }
 
-/* ==================================================================
-   3. GERENCIAMENTO DAS MODAIS (META E IMPORTANTE)
-   ================================================================== */
+if (btnPerfil && myDropdown) {
+    btnPerfil.addEventListener("click", function (e) {
+        e.preventDefault();
+        myDropdown.classList.toggle("show");
+        // Gira a setinha
+        if (arrowIcon) {
+            arrowIcon.style.transform = myDropdown.classList.contains("show") 
+                ? "rotate(-135deg)" : "rotate(45deg)";
+        }
+    });
+}
 
-/* ==================================================================
-   GERENCIAMENTO DA MODAL DE ROTINA (CRIAR E EDITAR)
-   ================================================================== */
-const modalMeta = document.getElementById("modalMeta");
+/* ------------------------------------------------------------------
+   3. SISTEMA DE ABAS
+   ------------------------------------------------------------------ */
+function abrirTab(evt, tabName) {
+    // 1. Esconde todos os conteúdos
+    const tabcontents = document.getElementsByClassName("tab-content");
+    for (let i = 0; i < tabcontents.length; i++) {
+        tabcontents[i].style.display = "none";
+    }
+
+    // 2. Desativa todos os botões
+    const tablinks = document.getElementsByClassName("tab-btn");
+    for (let i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // 3. Mostra o conteúdo clicado
+    const target = document.getElementById(tabName);
+    if(target) target.style.display = "block";
+
+    // 4. Ativa o botão visualmente
+    if (evt && evt.currentTarget && evt.currentTarget.classList.contains('tab-btn')) {
+        evt.currentTarget.className += " active";
+    } else {
+        // Se veio de um botão interno (ex: "Ir para Loja"), procura o botão da aba correspondente
+        for (let i = 0; i < tablinks.length; i++) {
+            if (tablinks[i].getAttribute('onclick') && tablinks[i].getAttribute('onclick').includes(tabName)) {
+                tablinks[i].classList.add("active");
+            }
+        }
+    }
+}
+
+/* ------------------------------------------------------------------
+   4. MODAL DE ROTINA (CRIAR E EDITAR)
+   ------------------------------------------------------------------ */
 const formRotina = document.getElementById("formRotina");
 const modalTitulo = document.getElementById("modalTitulo");
 const btnSalvarRotina = document.getElementById("btnSalvarRotina");
-const inputIdRotina = document.getElementById("inputIdRotina");
+const inputIdRotinaEdit = document.getElementById("inputIdRotina"); // ID para edição
 const inputTipoMeta = document.getElementById("tipoMeta");
-const inputPersonalizado = document.getElementById("metaTexto");
 const divPersonalizado = document.getElementById("inputPersonalizado");
+const inputPersonalizado = document.getElementById("metaTexto");
 const inputMinutosMeta = document.getElementById("inputMinutos");
 const checkboxesDias = document.querySelectorAll('input[name="dias[]"]');
-const closeMeta = modalMeta ? modalMeta.querySelector(".close-btn") : null;
+const pontosPreview = document.getElementById("pontosPreview");
 
-// Botões que abrem a modal para CRIAR (existem 2, um em cada aba)
-const btnsCriar = document.querySelectorAll(".btn-add-task");
-
-// 1. FUNÇÃO PARA ABRIR EM MODO "CRIAR"
-if (btnsCriar) {
-    btnsCriar.forEach(btn => {
-        btn.onclick = function() {
-            resetarModal(); // Limpa tudo
-            modalMeta.style.display = "block";
-        }
-    });
+// Função para limpar a modal (Reseta para modo "Criar")
+function resetarModal() {
+    if(!formRotina) return;
+    formRotina.reset();
+    modalTitulo.innerText = "Configurar Rotina";
+    btnSalvarRotina.innerText = "CRIAR ROTINA";
+    formRotina.action = "salvar_rotina.php";
+    if(inputIdRotinaEdit) inputIdRotinaEdit.value = "";
+    if(divPersonalizado) divPersonalizado.style.display = "none";
+    if(pontosPreview) pontosPreview.innerText = "0";
 }
 
-// 2. FUNÇÃO PARA ABRIR EM MODO "EDITAR" (Chamada pelo botão lápis no PHP)
+// Botões "+ Nova Rotina"
+const btnsCriar = document.querySelectorAll(".btn-add-task");
+btnsCriar.forEach(btn => {
+    btn.onclick = function() {
+        resetarModal();
+        if(modalMeta) modalMeta.style.display = "block";
+    }
+});
+
+// Função de EDIÇÃO (Chamada pelo botão Lápis no HTML)
 function abrirModalEditar(id, tipo, desc, duracao, diasString) {
-    resetarModal(); // Limpa antes de preencher
+    if(!modalMeta) return;
+    resetarModal(); // Limpa antes
     
-    // Muda visual para "Edição"
+    // Configura para edição
     modalTitulo.innerText = "Editar Rotina";
     btnSalvarRotina.innerText = "ATUALIZAR ROTINA";
-    formRotina.action = "atualizar_rotina.php"; // Aponta para o arquivo de update
-    inputIdRotina.value = id; // Define o ID escondido
+    formRotina.action = "atualizar_rotina.php";
+    if(inputIdRotinaEdit) inputIdRotinaEdit.value = id;
 
-    // Preenche os campos
-    inputTipoMeta.value = tipo;
-    inputMinutosMeta.value = duracao;
+    // Preenche campos
+    if(inputTipoMeta) inputTipoMeta.value = tipo;
+    if(inputMinutosMeta) inputMinutosMeta.value = duracao;
     
-    // Se for personalizado, mostra o campo
+    // Lógica do campo personalizado
     if (tipo === 'outro') {
-        divPersonalizado.style.display = "block";
-        inputPersonalizado.value = desc;
+        if(divPersonalizado) divPersonalizado.style.display = "block";
+        if(inputPersonalizado) inputPersonalizado.value = desc;
     } else {
-        divPersonalizado.style.display = "none";
+        if(divPersonalizado) divPersonalizado.style.display = "none";
     }
 
-    // Marca os dias da semana
-    // diasString vem como "Seg,Qua,Sex"
+    // Marca os dias
     const diasArray = diasString.split(',');
     checkboxesDias.forEach(chk => {
-        if (diasArray.includes(chk.value)) {
-            chk.checked = true;
-        }
+        if (diasArray.includes(chk.value)) chk.checked = true;
     });
 
     // Atualiza preview de pontos
-    const event = new Event('input');
-    inputMinutosMeta.dispatchEvent(event); // Força o recálculo dos pontos
+    if(pontosPreview) pontosPreview.innerText = duracao * 3;
 
     modalMeta.style.display = "block";
 }
 
-// Função auxiliar para limpar a modal
-function resetarModal() {
-    formRotina.reset(); // Limpa inputs
-    modalTitulo.innerText = "Configurar Rotina";
-    btnSalvarRotina.innerText = "CRIAR ROTINA";
-    formRotina.action = "salvar_rotina.php"; // Volta para o arquivo de salvar
-    inputIdRotina.value = "";
-    divPersonalizado.style.display = "none";
-    document.getElementById("pontosPreview").innerText = "0";
-}
-
-// Fechar Modal
-if (closeMeta) {
-    closeMeta.onclick = () => modalMeta.style.display = "none";
-}
-
-// --- MODAL IMPORTANTE ---
-const modalImportante = document.getElementById("modalImportante");
-const btnImportante = document.querySelector(".btn-importante");
-const closeImportante = document.getElementById("fecharImportante");
-const btnEntendi = document.getElementById("btnEntendi");
-
-if (btnImportante && modalImportante) {
-  btnImportante.onclick = function (e) {
-    e.preventDefault();
-    modalImportante.style.display = "block";
-  };
-
-  // Fecha no X
-  if (closeImportante) {
-    closeImportante.onclick = function () {
-      modalImportante.style.display = "none";
-    };
-  }
-
-  // Fecha no botão Entendi
-  if (btnEntendi) {
-    btnEntendi.onclick = function () {
-      modalImportante.style.display = "none";
-    };
-  }
-}
-
-/* ==================================================================
-   4. FUNÇÃO MESTRA: FECHAR TUDO AO CLICAR FORA
-   ================================================================== */
-window.onclick = function (event) {
-  // 1. Fecha Modal de Meta se clicar no fundo
-  if (modalMeta && event.target == modalMeta) {
-    modalMeta.style.display = "none";
-  }
-
-  // 2. Fecha Modal Importante se clicar no fundo
-  if (modalImportante && event.target == modalImportante) {
-    modalImportante.style.display = "none";
-  }
-
-  // 3. Fecha Dropdown se clicar fora dele
-  if (btnPerfil && !event.target.closest(".dropdown")) {
-    if (myDropdown && myDropdown.classList.contains("show")) {
-      myDropdown.classList.remove("show");
-      if (arrowIcon) arrowIcon.style.transform = "rotate(45deg)"; // Reseta a seta
-    }
-  }
-};
-
-/* ==================================================================
-   5. LÓGICA DO SELECT "OUTRO"
-   ================================================================== */
-// Esta função é chamada direto no HTML pelo onchange="verificarOutro(this)"
+// Lógica do Select "Outro"
 function verificarOutro(selectObject) {
-  const divPersonalizada = document.getElementById("inputPersonalizado");
-  const inputTexto = document.getElementById("metaTexto");
-
-  if (selectObject.value === "outro") {
-    divPersonalizada.style.display = "block";
-    if (inputTexto) inputTexto.focus();
-  } else {
-    divPersonalizada.style.display = "none";
-  }
-}
-
-/* ==================================================================
-   CÁLCULO DE PONTOS EM TEMPO REAL (INPUT NUMBER)
-   ================================================================== */
-const inputMinutos = document.getElementById("inputMinutos");
-const pontosPreview = document.getElementById("pontosPreview");
-
-if (inputMinutos && pontosPreview) {
-  inputMinutos.addEventListener("input", function () {
-    let minutos = parseInt(this.value);
-
-    if (isNaN(minutos) || minutos < 0) {
-      minutos = 0;
+    if (selectObject.value === "outro") {
+        if(divPersonalizado) divPersonalizado.style.display = "block";
+        if (inputPersonalizado) inputPersonalizado.focus();
+    } else {
+        if(divPersonalizado) divPersonalizado.style.display = "none";
     }
-
-    // Regra: 3 pontos por minuto
-    const pontos = minutos * 3;
-
-    pontosPreview.innerText = pontos;
-  });
 }
 
-/* ==================================================================
-   SISTEMA DE ABAS (HOJE / SEMANA)
-   ================================================================== */
-function abrirTab(evt, tabName) {
-  // 1. Esconde todos os conteúdos
-  var i, tabcontent, tablinks;
-  tabcontent = document.getElementsByClassName("tab-content");
-  for (i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].style.display = "none";
-  }
-
-  // 2. Tira a classe 'active' de todos os botões
-  tablinks = document.getElementsByClassName("tab-btn");
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
-  }
-
-  // 3. Mostra o conteúdo clicado e ativa o botão
-  document.getElementById(tabName).style.display = "block";
-  evt.currentTarget.className += " active";
+// Cálculo de Pontos em Tempo Real (Limite 1440)
+if (inputMinutosMeta && pontosPreview) {
+    inputMinutosMeta.addEventListener("input", function () {
+        let minutos = parseInt(this.value);
+        if (isNaN(minutos) || minutos < 0) minutes = 0;
+        
+        // Trava 24h
+        if (minutos > 1440) {
+            minutos = 1440;
+            this.value = 1440;
+            alert("O dia só tem 1440 minutos! 😂");
+        }
+        pontosPreview.innerText = minutos * 3;
+    });
 }
 
-/* ==================================================================
-   CONFIRMAÇÃO DE CONCLUSÃO (CHECK)
-   ================================================================== */
-const modalConfirm = document.getElementById("modalConfirmacao");
-const inputRotinaId = document.getElementById("inputRotinaId");
-const previewTask = document.getElementById("previewTaskConfirm");
-const closeConfirm = document.getElementById("fecharConfirmacao");
-const cancelConfirm = document.getElementById("btnCancelarConfirmacao");
+/* ------------------------------------------------------------------
+   5. MODAL DE CONFIRMAÇÃO (CHECK / CONCLUIR)
+   ------------------------------------------------------------------ */
+const inputRotinaIdCheck = document.getElementById("inputRotinaId"); // ID para o check
+const previewTaskConfirm = document.getElementById("previewTaskConfirm");
 
-// Função chamada pelo botão ✔ do HTML
 function abrirConfirmacao(id, nome, minutos, pontos, desc) {
-  if (!modalConfirm) return;
+    if (!modalConfirm) return;
 
-  // 1. Preenche o ID no formulário escondido
-  inputRotinaId.value = id;
+    if(inputRotinaIdCheck) inputRotinaIdCheck.value = id;
 
-  // 2. Monta o HTML do Card igualzinho ao da tela principal
-  // Usamos acento grave (`) para criar template string
-  let descHtml = desc ? `<small style="color: #888;">"${desc}"</small>` : "";
+    let descHtml = desc ? `<small style="color: #888;">"${desc}"</small>` : "";
 
-  previewTask.innerHTML = `
-        <div class="task-card" style="margin: 0; border-left: 4px solid var(--primary-color);">
-            <div class="task-info">
-                <h4 style="margin: 0; color: white; font-size: 1.1rem;">${nome}</h4>
-                <p style="margin: 5px 0 0; font-size: 0.9rem; color: #bbb;">
-                    ${minutos} min • <span style="color: gold">+${pontos} pts</span>
-                </p>
-                ${descHtml}
+    if(previewTaskConfirm) {
+        previewTaskConfirm.innerHTML = `
+            <div class="task-card" style="margin: 0; border-left: 4px solid var(--primary-color);">
+                <div class="task-info">
+                    <h4 style="margin: 0; color: white; font-size: 1.1rem;">${nome}</h4>
+                    <p style="margin: 5px 0 0; font-size: 0.9rem; color: #bbb;">
+                        ${minutos} min • <span style="color: gold">+${pontos} pts</span>
+                    </p>
+                    ${descHtml}
+                </div>
             </div>
-        </div>
-    `;
-
-  // 3. Abre a modal
-  modalConfirm.style.display = "block";
+        `;
+    }
+    modalConfirm.style.display = "block";
 }
 
-// Fechar Modal (X ou Botão Não)
-if (modalConfirm) {
-  if (closeConfirm)
-    closeConfirm.onclick = () => (modalConfirm.style.display = "none");
-  if (cancelConfirm)
-    cancelConfirm.onclick = () => (modalConfirm.style.display = "none");
-}
-
-/* ==================================================================
-   MODAL DE EXCLUSÃO (LIXEIRA)
-   ================================================================== */
-const modalDelete = document.getElementById("modalDelete");
+/* ------------------------------------------------------------------
+   6. MODAL DE EXCLUSÃO (LIXEIRA)
+   ------------------------------------------------------------------ */
 const btnConfirmarDelete = document.getElementById("btnConfirmarDelete");
-const fecharDelete = document.getElementById("fecharDelete");
-const btnCancelarDelete = document.getElementById("btnCancelarDelete");
 
 function abrirModalDelete(idRotina) {
     if (modalDelete && btnConfirmarDelete) {
-        // Atualiza o link do botão vermelho com o ID certo
         btnConfirmarDelete.href = "excluir_rotina.php?id=" + idRotina;
         modalDelete.style.display = "block";
     }
 }
 
-// Fechar modal de delete
-if (modalDelete) {
-    if(fecharDelete) fecharDelete.onclick = () => modalDelete.style.display = "none";
-    if(btnCancelarDelete) btnCancelarDelete.onclick = () => modalDelete.style.display = "none";
+/* ------------------------------------------------------------------
+   7. LOJA E RECOMPENSAS
+   ------------------------------------------------------------------ */
+// Modal Criar Recompensa
+const btnNovaRecompensa = document.getElementById("btnNovaRecompensa");
+const checkTemTempo = document.getElementById("checkTemTempo");
+const divTempoRecompensa = document.getElementById("divTempoRecompensa");
+
+if (btnNovaRecompensa && modalRecompensa) {
+    btnNovaRecompensa.onclick = () => modalRecompensa.style.display = "block";
+    
+    if (checkTemTempo) {
+        checkTemTempo.addEventListener('change', function() {
+            if(divTempoRecompensa) divTempoRecompensa.style.display = this.checked ? "block" : "none";
+        });
+    }
 }
+
+// Modal Comprar
+const textoConfirmacaoCompra = document.getElementById("textoConfirmacaoCompra");
+const idRecompensaCompra = document.getElementById("idRecompensaCompra");
+
+function abrirModalCompra(id, nome, preco) {
+    if (modalCompra) {
+        if(idRecompensaCompra) idRecompensaCompra.value = id;
+        if(textoConfirmacaoCompra) {
+            textoConfirmacaoCompra.innerHTML = `Você quer gastar <strong style="color: gold;">${preco} DT Points</strong><br>para obter: <strong>${nome}</strong>?`;
+        }
+        modalCompra.style.display = "block";
+    }
+}
+
+/* ------------------------------------------------------------------
+   8. INFO MODALS (IMPORTANTE & GAMIFICAÇÃO)
+   ------------------------------------------------------------------ */
+const btnImportante = document.querySelector(".btn-importante");
+const linkGamificacao = document.getElementById("linkGamificacao");
+const btnVoltarImportante = document.getElementById("btnVoltarImportante");
+
+if (btnImportante && modalImportante) {
+    btnImportante.onclick = (e) => { e.preventDefault(); modalImportante.style.display = "block"; };
+}
+
+if (linkGamificacao && modalGamificacao) {
+    linkGamificacao.onclick = (e) => {
+        e.preventDefault();
+        if(modalImportante) modalImportante.style.display = "none";
+        modalGamificacao.style.display = "block";
+    }
+}
+
+if (btnVoltarImportante) {
+    btnVoltarImportante.onclick = () => {
+        modalGamificacao.style.display = "none";
+        if(modalImportante) modalImportante.style.display = "block";
+    }
+}
+
+// Tooltip
+function toggleTooltip(element) {
+    element.classList.toggle("active");
+}
+
+/* ------------------------------------------------------------------
+   9. GERENCIADOR DE FECHAMENTO GLOBAL (WINDOW.ONCLICK)
+   ------------------------------------------------------------------ */
+// Fecha qualquer modal se clicar fora dela
+window.onclick = function (event) {
+    const modals = [modalMeta, modalImportante, modalGamificacao, modalConfirm, modalDelete, modalRecompensa, modalCompra];
+    
+    modals.forEach(m => {
+        if (m && event.target == m) m.style.display = "none";
+    });
+
+    // Fecha Dropdown Perfil
+    if (btnPerfil && !event.target.closest(".dropdown")) {
+        if (myDropdown && myDropdown.classList.contains("show")) {
+            myDropdown.classList.remove("show");
+            if (arrowIcon) arrowIcon.style.transform = "rotate(45deg)";
+        }
+    }
+    
+    // Fecha Tooltip
+    if (!event.target.closest('.help-icon')) {
+        document.querySelectorAll('.help-icon.active').forEach(el => el.classList.remove('active'));
+    }
+};
+
+// Gerenciador de Botões de Fechar (X, Cancelar, Entendi)
+const botoesFechar = document.querySelectorAll(".close-btn, #btnCancelarConfirmacao, #btnCancelarDelete, #btnCancelarCompra, #btnEntendi");
+botoesFechar.forEach(btn => {
+    btn.addEventListener("click", function() {
+        const modalPai = this.closest(".modal");
+        if(modalPai) modalPai.style.display = "none";
+    });
+});

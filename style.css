@@ -964,3 +964,136 @@ nav {
 button, a, .tab-btn, .task-card {
     transition: all 0.3s ease;
 }
+
+/* --- ESTILOS DA LOJA --- */
+.btn-buy {
+    background-color: transparent;
+    border: 2px solid #00e676; /* Borda Verde */
+    color: #00e676;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-buy:hover {
+    background-color: #00e676;
+    color: black;
+    transform: scale(1.05);
+}
+
+.btn-buy:disabled {
+    border-color: #555;
+    color: #555;
+    cursor: not-allowed;
+    background: transparent;
+}
+
+/* Tooltip (A interrogação) */
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+    cursor: help;
+}
+
+.tooltip-icon {
+    background-color: #444;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: 220px;
+    background-color: #111;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Aparece em cima */
+    left: 50%;
+    margin-left: -110px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.8rem;
+    border: 1px solid #444;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* --- ÍCONE DE AJUDA (TOOLTIP) --- */
+.help-icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 18px;           /* Pequenininho */
+    height: 18px;
+    border-radius: 50%;    /* Redondo */
+    background-color: rgba(255, 255, 255, 0.15); /* Cinza Transparente */
+    color: #aaa;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;    /* Para posicionar o texto em relação a ele */
+    margin-left: 8px;      /* Espaço do texto */
+    transition: all 0.2s;
+    user-select: none;     /* Não deixa selecionar o texto "?" */
+}
+
+.help-icon:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+/* A Caixa de Texto (Explicação) */
+.help-tooltip {
+    display: none;         /* Começa escondido */
+    position: absolute;
+    bottom: 140%;          /* Aparece em cima do ícone */
+    left: 50%;
+    transform: translateX(-50%); /* Centraliza */
+    
+    width: 250px;
+    background-color: #1a1a1a;
+    color: #ddd;
+    text-align: center;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    border: 1px solid #444;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    z-index: 100;
+}
+
+/* A setinha embaixo da caixa */
+.help-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* Embaixo da caixa */
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #444 transparent transparent transparent;
+}
+
+/* Quando ativa (via JS), mostra */
+.help-icon.active .help-tooltip {
+    display: block;
+    animation: fadeIn 0.3s;
+}
