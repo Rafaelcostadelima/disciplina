@@ -314,3 +314,21 @@ botoesFechar.forEach(btn => {
         if(modalPai) modalPai.style.display = "none";
     });
 });
+
+/* ==================================================================
+   AUTO-RELOAD NA VIRADA DO DIA (EVITA CONFLITOS DE DATA)
+   ================================================================== */
+// 1. Guarda o dia do mês no momento que a página carregou (ex: 25)
+let diaRegistrado = new Date().getDate();
+
+// 2. Cria um relógio que verifica a data a cada 60 segundos (60000 ms)
+setInterval(function() {
+    let dataAgora = new Date();
+    let diaAtual = dataAgora.getDate();
+
+    // 3. Compara: O dia de agora é diferente do dia que carregou?
+    if (diaAtual !== diaRegistrado) {
+        // Se mudou (ex: virou meia-noite), recarrega a página para atualizar o PHP
+        window.location.reload();
+    }
+}, 60000);
