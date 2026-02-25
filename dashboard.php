@@ -278,15 +278,38 @@ foreach ($todas_rotinas as $rotina) {
                                             <span style="color: gold; font-weight: bold;">💎 <?= $rec['preco'] ?> DT</span>
                                         </p>
                                     </div>
-                                    <div style="display: flex; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+
+                                        <!-- Lógica do Botão Comprar -->
                                         <?php if ($pode_comprar): ?>
                                             <button class="btn-buy"
-                                                onclick="abrirModalCompra(<?= $rec['id'] ?>, '<?= htmlspecialchars($rec['nome']) ?>', <?= $rec['preco'] ?>)">Comprar</button>
+                                                onclick="abrirModalCompra(<?= $rec['id'] ?>, '<?= htmlspecialchars($rec['nome']) ?>', <?= $rec['preco'] ?>)">
+                                                Comprar
+                                            </button>
                                         <?php else: ?>
-                                            <button class="btn-buy" disabled style="opacity: 0.5;">Faltam DT</button>
+                                            <button class="btn-buy" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                                Faltam DT
+                                            </button>
                                         <?php endif; ?>
-                                        <a href="excluir_recompensa.php?id=<?= $rec['id'] ?>" class="btn-delete"
-                                            onclick="return confirm('Excluir item da loja?')" style="margin-left: 10px;">🗑️</a>
+
+                                        <!-- NOVO BOTÃO DE LIXEIRA (Com ícone e estilo novo) -->
+                                        <a href="excluir_recompensa.php?id=<?= $rec['id'] ?>" class="btn-trash-shop"
+                                            onclick="return confirm('Tem certeza que deseja excluir esta recompensa?')"
+                                            title="Excluir item da loja">
+
+                                            <!-- Ícone da Lixeira (SVG) -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path
+                                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                                </path>
+                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                            </svg>
+                                        </a>
+
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -351,11 +374,11 @@ foreach ($todas_rotinas as $rotina) {
     </main>
 
     <!-- MODAL 1: CRIAR/EDITAR ROTINA -->
-    <div id="modalMeta" class="modal"> 
+    <div id="modalMeta" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h2 id="modalTitulo" style="color: var(--primary-color); margin-bottom: 5px;">Configurar Rotina</h2>
-            
+
             <form id="formRotina" class="modal-form" action="salvar_rotina.php" method="POST">
                 <!-- INPUT OCULTO PARA EDIÇÃO -->
                 <input type="hidden" name="id_rotina" id="inputIdRotina">
@@ -370,11 +393,11 @@ foreach ($todas_rotinas as $rotina) {
                     <option value="meditar">Meditar</option>
                     <option value="outro">Outro (Personalizado)...</option>
                 </select>
-                
+
                 <div id="inputPersonalizado" style="display: none;">
                     <input type="text" name="descricao_personalizada" id="metaTexto" placeholder="Nome da atividade...">
                 </div>
-                
+
                 <label>Quais dias da semana?</label>
                 <div class="dias-semana-wrapper">
                     <input type="checkbox" name="dias[]" value="Dom" id="dom"><label for="dom">D</label>
@@ -385,19 +408,23 @@ foreach ($todas_rotinas as $rotina) {
                     <input type="checkbox" name="dias[]" value="Sex" id="sex"><label for="sex">S</label>
                     <input type="checkbox" name="dias[]" value="Sab" id="sab"><label for="sab">S</label>
                 </div>
-                
+
                 <label>Duração (Minutos)</label>
-                <input type="number" name="duracao" id="inputMinutos" class="input-minutos" placeholder="00" min="1" max="1440" required>
-                
-                <div style="background-color: #2a2a2a; padding: 10px; border-radius: 5px; text-align: center; margin-top: 10px;">
+                <input type="number" name="duracao" id="inputMinutos" class="input-minutos" placeholder="00" min="1"
+                    max="1440" required>
+
+                <div
+                    style="background-color: #2a2a2a; padding: 10px; border-radius: 5px; text-align: center; margin-top: 10px;">
                     <span style="color: #bbb; font-size: 0.9rem;">Valor desta rotina:</span><br>
-                    <span id="pontosPreview" style="color: gold; font-weight: bold; font-size: 1.4rem;">0</span> 
+                    <span id="pontosPreview" style="color: gold; font-weight: bold; font-size: 1.4rem;">0</span>
                     <span style="color: gold;">DT</span>
                 </div>
-                
-                <p style="text-align: center; font-size: 0.7rem; color: #666; margin-top: 5px;">(1 minuto = 3 pontos)</p>
-                
-                <button type="submit" id="btnSalvarRotina" class="btn-submit" style="margin-top: 20px;">CRIAR ROTINA</button>
+
+                <p style="text-align: center; font-size: 0.7rem; color: #666; margin-top: 5px;">(1 minuto = 3 pontos)
+                </p>
+
+                <button type="submit" id="btnSalvarRotina" class="btn-submit" style="margin-top: 20px;">CRIAR
+                    ROTINA</button>
             </form>
         </div>
     </div>
@@ -408,67 +435,75 @@ foreach ($todas_rotinas as $rotina) {
             <span class="close-btn" id="fecharImportante">&times;</span>
             <h2 style="color: var(--primary-color); margin-bottom: 20px;">Importante</h2>
             <p style="font-size: 1.1rem; line-height: 1.6; color: #ddd;">
-                É importante ter em mente que você deve se compromissar com o app. 
+                É importante ter em mente que você deve se compromissar com o app.
             </p>
             <br>
             <p style="font-size: 1.1rem; line-height: 1.6; color: #ddd;">
-                Somos apenas uma peça para que você possa organizar a sua rotina utilizando o método de 
-                <a href="#" id="linkGamificacao" style="color: var(--primary-color); text-decoration: underline; font-weight: bold;">gamificação</a>.
+                Somos apenas uma peça para que você possa organizar a sua rotina utilizando o método de
+                <a href="#" id="linkGamificacao"
+                    style="color: var(--primary-color); text-decoration: underline; font-weight: bold;">gamificação</a>.
             </p>
-            <button type="button" class="btn-submit" id="btnEntendi" style="margin-top: 25px; background-color: #333; border: 1px solid #555;">Entendi</button>
+            <button type="button" class="btn-submit" id="btnEntendi"
+                style="margin-top: 25px; background-color: #333; border: 1px solid #555;">Entendi</button>
         </div>
     </div>
 
     <!-- MODAL 3: GAMIFICAÇÃO (INFO) -->
-<div id="modalGamificacao" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" id="fecharGamificacao">&times;</span>
-        
-        <h2 style="color: var(--primary-color); margin-bottom: 20px; text-align: center;">Sistema de Gamificação</h2>
-        
-        <!-- Área com scroll caso o texto seja grande em telas pequenas -->
-        <div style="overflow-y: auto; max-height: 60vh; padding-right: 5px;">
-            
-            <p style="color: #ddd; line-height: 1.6; margin-bottom: 15px;">
-                A <strong>Gamificação</strong> transforma sua rotina em um RPG. Cada tarefa concluída te dá experiência (DT Points).
-            </p>
+    <div id="modalGamificacao" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="fecharGamificacao">&times;</span>
 
-            <h3 style="color: white; margin-top: 20px; border-bottom: 1px solid #333; padding-bottom: 5px;">Como ganhar pontos?</h3>
-            <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 10px;">A regra é simples: <strong>1 minuto de foco = 3 DT Points</strong>.</p>
+            <h2 style="color: var(--primary-color); margin-bottom: 20px; text-align: center;">Sistema de Gamificação
+            </h2>
 
-            <!-- Tabela de Exemplos -->
-            <table style="width: 100%; text-align: left; border-collapse: collapse; margin-bottom: 20px;">
-                <tr style="border-bottom: 1px solid #444;">
-                    <th style="padding: 10px; color: var(--primary-color);">Atividade</th>
-                    <th style="padding: 10px; color: var(--primary-color);">Tempo</th>
-                    <th style="padding: 10px; color: gold;">Recompensa</th>
-                </tr>
-                <tr style="border-bottom: 1px solid #333;">
-                    <td style="padding: 10px; color: #ccc;">Ler 10 págs</td>
-                    <td style="padding: 10px; color: #ccc;">10 min</td>
-                    <td style="padding: 10px; color: gold; font-weight: bold;">+30 pts</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #333;">
-                    <td style="padding: 10px; color: #ccc;">Treino Rápido</td>
-                    <td style="padding: 10px; color: #ccc;">30 min</td>
-                    <td style="padding: 10px; color: gold; font-weight: bold;">+90 pts</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; color: #ccc;">Estudo Focado</td>
-                    <td style="padding: 10px; color: #ccc;">1 hora</td>
-                    <td style="padding: 10px; color: gold; font-weight: bold;">+180 pts</td>
-                </tr>
-            </table>
+            <!-- Área com scroll caso o texto seja grande em telas pequenas -->
+            <div style="overflow-y: auto; max-height: 60vh; padding-right: 5px;">
 
-            <h3 style="color: white; margin-top: 20px; border-bottom: 1px solid #333; padding-bottom: 5px;">Para que servem?</h3>
-            <p style="color: #ddd; line-height: 1.6;">
-                Use seus pontos na <strong>Loja</strong> para comprar recompensas que você mesmo define!
-            </p>
+                <p style="color: #ddd; line-height: 1.6; margin-bottom: 15px;">
+                    A <strong>Gamificação</strong> transforma sua rotina em um RPG. Cada tarefa concluída te dá
+                    experiência (DT Points).
+                </p>
+
+                <h3 style="color: white; margin-top: 20px; border-bottom: 1px solid #333; padding-bottom: 5px;">Como
+                    ganhar pontos?</h3>
+                <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 10px;">A regra é simples: <strong>1 minuto de
+                        foco = 3 DT Points</strong>.</p>
+
+                <!-- Tabela de Exemplos -->
+                <table style="width: 100%; text-align: left; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr style="border-bottom: 1px solid #444;">
+                        <th style="padding: 10px; color: var(--primary-color);">Atividade</th>
+                        <th style="padding: 10px; color: var(--primary-color);">Tempo</th>
+                        <th style="padding: 10px; color: gold;">Recompensa</th>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #333;">
+                        <td style="padding: 10px; color: #ccc;">Ler 10 págs</td>
+                        <td style="padding: 10px; color: #ccc;">10 min</td>
+                        <td style="padding: 10px; color: gold; font-weight: bold;">+30 pts</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #333;">
+                        <td style="padding: 10px; color: #ccc;">Treino Rápido</td>
+                        <td style="padding: 10px; color: #ccc;">30 min</td>
+                        <td style="padding: 10px; color: gold; font-weight: bold;">+90 pts</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; color: #ccc;">Estudo Focado</td>
+                        <td style="padding: 10px; color: #ccc;">1 hora</td>
+                        <td style="padding: 10px; color: gold; font-weight: bold;">+180 pts</td>
+                    </tr>
+                </table>
+
+                <h3 style="color: white; margin-top: 20px; border-bottom: 1px solid #333; padding-bottom: 5px;">Para que
+                    servem?</h3>
+                <p style="color: #ddd; line-height: 1.6;">
+                    Use seus pontos na <strong>Loja</strong> para comprar recompensas que você mesmo define!
+                </p>
+            </div>
+
+            <button type="button" id="btnVoltarImportante" class="btn-submit"
+                style="margin-top: 20px; background-color: #333; border: 1px solid #555;">Voltar</button>
         </div>
-
-        <button type="button" id="btnVoltarImportante" class="btn-submit" style="margin-top: 20px; background-color: #333; border: 1px solid #555;">Voltar</button>
     </div>
-</div>
 
     <!-- MODAL 4: CONFIRMAÇÃO (CHECK) -->
     <div id="modalConfirmacao" class="modal">
@@ -481,7 +516,9 @@ foreach ($todas_rotinas as $rotina) {
                 <input type="hidden" name="rotina_id" id="inputRotinaId">
                 <div style="display: flex; gap: 10px; flex-direction: column;">
                     <button type="submit" class="btn-submit" style="font-size: 1.1rem;">Sim, eu tenho!</button>
-                    <button type="button" id="btnCancelarConfirmacao" style="background: transparent; border: 1px solid #555; color: #888; padding: 10px; border-radius: 5px; cursor: pointer;">Não completei :(</button>
+                    <button type="button" id="btnCancelarConfirmacao"
+                        style="background: transparent; border: 1px solid #555; color: #888; padding: 10px; border-radius: 5px; cursor: pointer;">Não
+                        completei :(</button>
                 </div>
             </form>
         </div>
@@ -492,9 +529,11 @@ foreach ($todas_rotinas as $rotina) {
         <div class="modal-content" style="text-align: center; max-width: 400px;">
             <span class="close-btn" id="fecharDelete">&times;</span>
             <h2 style="color: #ff4444; margin-bottom: 15px;">Apagar Rotina?</h2>
-            <p style="color: #ddd; margin-bottom: 25px;">Esta ação é permanente e vai apagar todo o histórico desta tarefa. Tem certeza?</p>
+            <p style="color: #ddd; margin-bottom: 25px;">Esta ação é permanente e vai apagar todo o histórico desta
+                tarefa. Tem certeza?</p>
             <a href="#" id="btnConfirmarDelete" class="btn-confirm-delete">Sim, apagar para sempre</a>
-            <button type="button" id="btnCancelarDelete" style="background: transparent; border: 1px solid #555; color: #aaa; padding: 10px; border-radius: 5px; cursor: pointer; width: 100%;">Cancelar</button>
+            <button type="button" id="btnCancelarDelete"
+                style="background: transparent; border: 1px solid #555; color: #aaa; padding: 10px; border-radius: 5px; cursor: pointer; width: 100%;">Cancelar</button>
         </div>
     </div>
 

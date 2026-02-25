@@ -33,20 +33,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensagem = "Erro: As senhas não conferem!";
     } else {
         try {
+            // Verifica se já existe
             $check = $pdo->prepare("SELECT id FROM usuarios WHERE email = :e OR username = :u");
             $check->execute([':e' => $form_email, ':u' => $form_user]);
             
             if ($check->rowCount() > 0) {
                 $mensagem = "Erro: Email ou Username já estão em uso.";
             } else {
-                // Inserção
+                // --- AQUI ESTÁ A CORREÇÃO DA CRIPTOGRAFIA ---
+                $senha_criptografada = password_hash($senha, PASSWORD_DEFAULT);
+
+                // Inserção (Corrigindo o erro HY093: os nomes :parametro devem ser iguais)
                 $sql = "INSERT INTO usuarios (nome, username, email, senha) VALUES (:nome, :username, :email, :senha)";
                 $stmt = $pdo->prepare($sql);
+                
                 $stmt->execute([
-                    ':nome' => $form_nome,
+                    ':nome'     => $form_nome,
                     ':username' => $form_user,
-                    ':email' => $form_email,
-                    ':senha' => $senha // Lembre-se: em produção use password_hash()
+                    ':email'    => $form_email,
+                    ':senha'    => $senha_criptografada // Enviamos a senha HASH, não a normal
                 ]);
 
                 $mensagem = "Conta criada com sucesso! Faça login.";
@@ -80,10 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <ul class="nav-links">
                 <li><a href="#" class="desativado">Minhas Rotina</a></li>
                 <li><a href="#" class="desativado">Desempenho</a></li>
-
-                <!-- DROPDOWN PERFIL -->
                 <li class="dropdown">
-                    <!-- Adicionei a classe "arrow" aqui dentro -->
                     <a href="javascript:void(0)" id="btnPerfil" class="dropbtn desativado">
                         Perfil
                     </a>
@@ -103,14 +105,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="login-card" style="margin-top: 50px;">
             <h2>Crie sua conta</h2>
 
-            <!-- Se for sucesso, mostra aqui em cima mesmo -->
             <?php if($sucesso): ?>
                 <p style="color: green; margin-bottom: 15px; font-weight: bold;"><?= $mensagem ?></p>
             <?php endif; ?>
 
             <?php if(!$sucesso): ?>
             <form action="cadastro.php" method="POST">
-                <!-- Nome (Com value preenchido pelo PHP) -->
                 <div class="input-group">
                     <label for="nome">Nome Completo</label>
                     <input type="text" name="nome" id="nome" 
@@ -118,7 +118,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            placeholder="Ex: João Silva" required>
                 </div>
 
-                <!-- Username -->
                 <div class="input-group">
                     <label for="username">Username</label>
                     <input type="text" name="username" id="username" 
@@ -126,7 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            placeholder="@joaosilva" required>
                 </div>
 
-                <!-- Email -->
                 <div class="input-group">
                     <label for="email">E-mail</label>
                     <input type="email" name="email" id="email" 
@@ -134,7 +132,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            placeholder="seu@email.com" required>
                 </div>
 
-                <!-- Senhas (sem value, por segurança elas sempre limpam) -->
                 <div class="input-group">
                     <label for="senha">Senha</label>
                     <input type="password" name="senha" id="senha" placeholder="Crie uma senha forte" required>
@@ -145,7 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="password" name="confirmar_senha" id="confirmar_senha" placeholder="Repita a senha" required>
                 </div>
 
-                <!-- MENSAGEM DE ERRO AGORA FICA AQUI -->
                 <?php if($mensagem && !$sucesso): ?>
                     <p style="color: red; font-size: 0.9rem; margin-bottom: 10px;">
                         <?= $mensagem ?>

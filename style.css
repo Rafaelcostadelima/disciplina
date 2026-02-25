@@ -1098,3 +1098,118 @@ button, a, .tab-btn, .task-card {
     display: block;
     animation: fadeIn 0.3s;
 }
+
+/* =========================================
+   NOVO ESTILO: BOTÃO LIXEIRA DA LOJA
+   ========================================= */
+.btn-trash-shop {
+    background-color: rgba(255, 68, 68, 0.1); /* Fundo vermelho bem suave */
+    border: 1px solid #ff4444; /* Borda vermelha fina */
+    color: #ff4444;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px; /* Quadrado arredondado */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efeito elástico */
+    font-size: 1.2rem;
+    margin-left: 10px;
+}
+
+.btn-trash-shop:hover {
+    background-color: #ff4444;
+    color: white;
+    transform: scale(1.1) rotate(10deg); /* Cresce e gira um pouquinho */
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.4);
+}
+
+/* =========================================
+   CORREÇÃO TOTAL DE RESPONSIVIDADE (MOBILE)
+   ========================================= */
+
+/* Ajuste geral para telas menores que 768px (Tablets e Celulares) */
+@media (max-width: 768px) {
+    
+    /* 1. Ajuste do Container Principal */
+    .login-container {
+        padding-top: 80px !important; /* Mais espaço para não ficar atrás do menu */
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    /* 2. Cabeçalho do Dashboard (Nome e Pontos) */
+    .header-dashboard {
+        flex-direction: column; /* Empilha um em cima do outro */
+        align-items: center;    /* Centraliza */
+        text-align: center;
+        gap: 15px;
+    }
+
+    .dt-points-badge {
+        width: 100%;            /* Ocupa a largura toda */
+        justify-content: center;
+        padding: 10px;
+        font-size: 1.1rem;
+    }
+
+    /* 3. Abas Roláveis (Para não quebrar em telas pequenas) */
+    .tabs-header {
+        overflow-x: auto;       /* Permite rolar para o lado se não couber */
+        white-space: nowrap;    /* Impede que os botões quebrem linha */
+        padding-bottom: 5px;    /* Espaço para a barra de rolagem não colar */
+        -webkit-overflow-scrolling: touch; /* Rolagem suave no iPhone */
+    }
+
+    .tab-btn {
+        padding: 12px 20px;
+        flex-shrink: 0;         /* Garante que o botão não encolha */
+        font-size: 0.9rem;
+    }
+
+    /* 4. Cards de Tarefas e Loja (Onde costuma quebrar) */
+    .task-card {
+        flex-direction: column; /* Conteúdo em cima, botões embaixo */
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .task-info {
+        width: 100%; /* Texto ocupa tudo */
+    }
+
+    /* O container dos botões (Check, Editar, Comprar) */
+    .task-card > div:last-child {
+        width: 100%;
+        display: flex;
+        justify-content: space-between; /* Botões espalhados nas pontas */
+        align-items: center;
+        border-top: 1px solid #333;     /* Uma linha separando */
+        padding-top: 10px;
+    }
+
+    /* Botão de comprar ocupa mais espaço no celular */
+    .btn-buy {
+        flex-grow: 1;           /* Estica para preencher */
+        text-align: center;
+        margin-right: 10px;
+    }
+
+    /* 5. Ajustes de Texto */
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.5rem; }
+    
+    /* 6. Modal Full Screen no celular para facilitar o clique */
+    .modal-content {
+        width: 95%;
+        margin: 20% auto;
+        padding: 20px;
+    }
+    
+    /* Aumentar inputs para facilitar o toque (evita zoom no iPhone) */
+    input, select {
+        font-size: 16px !important; 
+        padding: 15px;
+    }
+}

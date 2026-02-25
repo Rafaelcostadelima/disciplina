@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// Configuração e Conexão
 $host = 'localhost';
 $db = 'disciplina_db';
 $user = 'root';
@@ -13,38 +14,40 @@ try {
     die("Erro na conexão: " . $e->getMessage());
 }
 
+// Verifica se já está logado (Se estiver, manda direto pro Dashboard)
+if (isset($_SESSION['usuario_id'])) {
+    header("Location: dashboard.php");
+    exit;
+}
+
 // Verifica se foi enviado o formulário
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $senha = $_POST['senha'];
 
+    // Busca o usuário pelo email
     $sql = "SELECT * FROM usuarios WHERE email = :email";
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':email', $email);
     $stmt->execute();
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($usuario && $usuario['senha'] == $senha) {
-        // Sucesso
+    /* 
+       AQUI ESTÁ O SEGREDO:
+       Usamos password_verify para comparar a senha digitada com a criptografia do banco.
+    */
+    if ($usuario && password_verify($senha, $usuario['senha'])) {
+        // --- LOGIN COM SUCESSO ---
         $_SESSION['usuario_nome'] = $usuario['nome'];
         $_SESSION['usuario_id'] = $usuario['id'];
 
-        // Redireciona para Dashboard (ainda não criamos, então vai pra ele mesmo com sucesso)
-        if ($usuario && $usuario['senha'] == $senha) {
-            // Sucesso
-            $_SESSION['usuario_nome'] = $usuario['nome'];
-            $_SESSION['usuario_id'] = $usuario['id'];
-
-            header("Location: dashboard.php"); // AGORA VAI PRO DASHBOARD!
-            exit;
-        }
-        $_SESSION['msg_sucesso'] = "Login realizado com sucesso! Bem-vindo " . $usuario['nome'];
-        header("Location: index.php"); // Recarrega para limpar o POST
+        // Redireciona para o Dashboard imediatamente
+        header("Location: dashboard.php");
         exit;
     } else {
-        // Erro: Salva na sessão e recarrega a página
+        // --- ERRO DE LOGIN ---
         $_SESSION['msg_erro'] = "Email ou senha incorretos.";
-        header("Location: index.php"); // O segredo está aqui: recarregar a página limpa
+        header("Location: index.php"); // Recarrega para mostrar o erro
         exit;
     }
 }
@@ -56,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In -Disciplina Total</title>
+    <title>Log In - Disciplina Total</title>
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="img/logodt.png" type="image/x-icon">
 </head>
@@ -90,12 +93,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="login-card">
             <h2>Acesse sua conta</h2>
 
-            <!-- Mensagem de Sucesso (se houver) -->
+            <!-- Mensagem de Sucesso (vinda do cadastro) -->
             <?php if (isset($_SESSION['msg_sucesso'])): ?>
                 <p style="color: green; margin-bottom: 10px;">
                     <?= $_SESSION['msg_sucesso']; ?>
                 </p>
-                <?php unset($_SESSION['msg_sucesso']); // Limpa a mensagem após exibir ?>
+                <?php unset($_SESSION['msg_sucesso']); ?>
             <?php endif; ?>
 
             <form action="index.php" method="POST">
@@ -108,12 +111,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="password" name="senha" id="senha" placeholder="********" required>
                 </div>
 
-                <!-- MENSAGEM DE ERRO (Agora entre a senha e o botão) -->
+                <!-- Mensagem de Erro -->
                 <?php if (isset($_SESSION['msg_erro'])): ?>
                     <p style="color: red; font-size: 0.9rem; margin-top: 5px; margin-bottom: 5px;">
                         <?= $_SESSION['msg_erro']; ?>
                     </p>
-                    <?php unset($_SESSION['msg_erro']); // Limpa a mensagem para sumir no refresh ?>
+                    <?php unset($_SESSION['msg_erro']); ?>
                 <?php endif; ?>
 
                 <button type="submit" class="btn-submit">ENTRAR</button>
@@ -127,5 +130,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="script.js"></script>
 </body>
-
 </html>
