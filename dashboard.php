@@ -1,6 +1,14 @@
 <?php
-session_start();
+// Carrega o autologin (que já tem session_start)
+require_once 'autologin.php';
+
 date_default_timezone_set('America/Sao_Paulo');
+
+// Se mesmo com autologin não tiver ID, aí sim expulsa
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: index.php");
+    exit;
+}
 
 // 1. Conexão
 $host = 'localhost';
@@ -162,11 +170,31 @@ foreach ($todas_rotinas as $rotina) {
                                                 onclick="abrirConfirmacao(<?= $rotina['id'] ?>, '<?= htmlspecialchars($rotina['tipo_meta']) ?>', <?= $rotina['duracao_minutos'] ?>, <?= $rotina['pontos_recompensa'] ?>, '<?= htmlspecialchars($rotina['descricao_personalizada'] ?? '') ?>')">✔</button>
                                         <?php endif; ?>
 
-                                        <div class="action-buttons">
+                                        <div class="action-buttons" style="display: flex; gap: 5px;">
+
+                                            <!-- BOTÃO EDITAR (MANTIDO INTACTO) -->
                                             <button class="btn-icon btn-edit"
-                                                onclick="abrirModalEditar(<?= $rotina['id'] ?>, '<?= htmlspecialchars($rotina['tipo_meta']) ?>', '<?= htmlspecialchars($rotina['descricao_personalizada'] ?? '') ?>', <?= $rotina['duracao_minutos'] ?>, '<?= $rotina['dias_semana'] ?>')">✏️</button>
-                                            <button class="btn-icon btn-delete"
-                                                onclick="abrirModalDelete(<?= $rotina['id'] ?>)">🗑️</button>
+                                                onclick="abrirModalEditar(<?= $rotina['id'] ?>, '<?= htmlspecialchars($rotina['tipo_meta']) ?>', '<?= htmlspecialchars($rotina['descricao_personalizada'] ?? '') ?>', <?= $rotina['duracao_minutos'] ?>, '<?= $rotina['dias_semana'] ?>')">
+                                                ✏️
+                                            </button>
+
+                                            <!-- NOVO BOTÃO DE LIXEIRA (Estilo Loja) -->
+                                            <a href="excluir_rotina.php?id=<?= $rotina['id'] ?>" class="btn-trash-shop"
+                                                onclick="return confirm('Tem certeza que deseja apagar esta rotina? Todo o histórico dela será perdido.')"
+                                                style="width: 35px; height: 35px; margin: 0; padding: 0;" title="Apagar Rotina">
+
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                                    <path
+                                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                                    </path>
+                                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                </svg>
+                                            </a>
+
                                         </div>
                                     </div>
                                 </div>
@@ -183,11 +211,13 @@ foreach ($todas_rotinas as $rotina) {
                     <?php
                     $ano_atual = date('Y');
                     $semana_atual = date('W');
+
                     foreach ($ordem_dias as $sigla => $num_dia_iso):
                         $data_calculada = new DateTime();
                         $data_calculada->setISODate($ano_atual, $semana_atual, $num_dia_iso);
                         $data_string = $data_calculada->format('Y-m-d');
 
+                        // 1. Filtra rotinas deste dia específico
                         $rotinas_deste_dia = [];
                         foreach ($todas_rotinas as $r) {
                             if (strpos($r['dias_semana'], $sigla) !== false) {
@@ -195,8 +225,11 @@ foreach ($todas_rotinas as $rotina) {
                             }
                         }
 
+                        // 2. Processa status e contagens
                         $perdidas = 0;
+                        $concluidas_count = 0; // Contador de tarefas feitas
                         $lista_renderizada = [];
+
                         foreach ($rotinas_deste_dia as $r) {
                             $chave = $r['id'] . '_' . $data_string;
                             $foi_feito = isset($mapa_feitos[$chave]);
@@ -205,6 +238,7 @@ foreach ($todas_rotinas as $rotina) {
 
                             if ($foi_feito) {
                                 $status = "feito";
+                                $concluidas_count++; // Soma +1 concluída
                             } elseif ($eh_passado) {
                                 if ($data_string < $data_criacao_rotina) {
                                     $status = "proxima_semana";
@@ -217,13 +251,30 @@ foreach ($todas_rotinas as $rotina) {
                             }
                             $lista_renderizada[] = ['r' => $r, 'status' => $status];
                         }
+
+                        // Verifica se completou TODAS (Total > 0 e Concluídas == Total)
+                        $dia_perfeito = (count($rotinas_deste_dia) > 0 && $concluidas_count == count($rotinas_deste_dia));
                         ?>
+
                         <div class="day-group" id="day-<?= $sigla ?>">
-                            <h3 class="day-header"><?= $nomes_dias_extenso[$sigla] ?> <span
-                                    style="font-size: 0.8rem; color: #555;">(<?= $data_calculada->format('d/m') ?>)</span>
+                            <h3 class="day-header">
+                                <?= $nomes_dias_extenso[$sigla] ?>
+                                <span style="font-size: 0.8rem; color: #555;">(<?= $data_calculada->format('d/m') ?>)</span>
                             </h3>
+
+                            <!-- MENSAGEM DE 100% CONCLUÍDO (NOVO) -->
+                            <?php if ($dia_perfeito): ?>
+                                <div class="msg-dia-completo">
+                                    <span>🏆</span> Dia dominado! Todas as tarefas concluídas.
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Alerta de perdidas -->
                             <?php if ($perdidas > 0): ?>
-                                <div class="missed-alert">⚠ <?= $perdidas ?> hábito(s) não feitos</div><?php endif; ?>
+                                <div class="missed-alert">⚠ <?= $perdidas ?> hábito(s) não feitos</div>
+                            <?php endif; ?>
+
+                            <!-- Lista de Tarefas -->
                             <?php if (count($lista_renderizada) > 0): ?>
                                 <div class="task-list">
                                     <?php foreach ($lista_renderizada as $item):
@@ -234,27 +285,56 @@ foreach ($todas_rotinas as $rotina) {
                                             style="display: flex; justify-content: space-between; align-items: center; <?= $status == 'perdido' ? 'opacity: 0.5;' : '' ?>">
                                             <div>
                                                 <span><?= htmlspecialchars($rotina['tipo_meta']) ?></span>
-                                                <?php if ($rotina['descricao_personalizada']): ?><small
-                                                        style="color:#666; display:block; font-size:0.75rem"><?= htmlspecialchars($rotina['descricao_personalizada']) ?></small><?php endif; ?>
+                                                <?php if ($rotina['descricao_personalizada']): ?>
+                                                    <small
+                                                        style="color:#666; display:block; font-size:0.75rem"><?= htmlspecialchars($rotina['descricao_personalizada']) ?></small>
+                                                <?php endif; ?>
                                             </div>
                                             <div style="display: flex; align-items: center; gap: 10px;">
-                                                <?php if ($status == 'feito'): ?><span class="status-done">✔ Feito</span>
-                                                <?php elseif ($status == 'perdido'): ?><span
-                                                        style="color: #ff5555; font-size: 0.8rem;">Não feito</span>
-                                                <?php elseif ($status == 'proxima_semana'): ?><span class="status-next-week">Próxima
-                                                        semana</span>
-                                                <?php else: ?><span
-                                                        style="color: #888; font-size: 0.8rem;">Pendente</span><?php endif; ?>
-                                                <div class="action-buttons"><button class="btn-icon btn-edit"
-                                                        onclick="abrirModalEditar(<?= $rotina['id'] ?>, '<?= htmlspecialchars($rotina['tipo_meta']) ?>', '<?= htmlspecialchars($rotina['descricao_personalizada'] ?? '') ?>', <?= $rotina['duracao_minutos'] ?>, '<?= $rotina['dias_semana'] ?>')">✏️</button><button
-                                                        class="btn-icon btn-delete"
-                                                        onclick="abrirModalDelete(<?= $rotina['id'] ?>)">🗑️</button></div>
+                                                <?php if ($status == 'feito'): ?>
+                                                    <span class="status-done">✔ Feito</span>
+                                                <?php elseif ($status == 'perdido'): ?>
+                                                    <span style="color: #ff5555; font-size: 0.8rem;">Não feito</span>
+                                                <?php elseif ($status == 'proxima_semana'): ?>
+                                                    <span class="status-next-week">Próxima semana</span>
+                                                <?php else: ?>
+                                                    <span style="color: #888; font-size: 0.8rem;">Pendente</span>
+                                                <?php endif; ?>
+
+                                                <div class="action-buttons" style="display: flex; gap: 5px;">
+
+                                                    <!-- BOTÃO EDITAR (MANTIDO INTACTO) -->
+                                                    <button class="btn-icon btn-edit"
+                                                        onclick="abrirModalEditar(<?= $rotina['id'] ?>, '<?= htmlspecialchars($rotina['tipo_meta']) ?>', '<?= htmlspecialchars($rotina['descricao_personalizada'] ?? '') ?>', <?= $rotina['duracao_minutos'] ?>, '<?= $rotina['dias_semana'] ?>')">
+                                                        ✏️
+                                                    </button>
+
+                                                    <!-- NOVO BOTÃO DE LIXEIRA (Estilo Loja) -->
+                                                    <a href="excluir_rotina.php?id=<?= $rotina['id'] ?>" class="btn-trash-shop"
+                                                        onclick="return confirm('Tem certeza que deseja apagar esta rotina?')"
+                                                        style="width: 35px; height: 35px; margin: 0; padding: 0;"
+                                                        title="Apagar Rotina">
+
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round">
+                                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                                            <path
+                                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                                            </path>
+                                                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                        </svg>
+                                                    </a>
+
+                                                </div>
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
                             <?php else: ?>
-                                <p class="text-muted-small">Nenhum hábito.</p><?php endif; ?>
+                                <p class="text-muted-small">Nenhum hábito.</p>
+                            <?php endif; ?>
                         </div>
                         <hr class="divider-week">
                     <?php endforeach; ?>

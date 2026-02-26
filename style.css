@@ -302,39 +302,36 @@ nav {
     }
 }
 
-/* --- ESTILOS DO DROPDOWN (PERFIL) --- */
+/* ==================================================================
+   ESTILOS UNIFICADOS DO DROPDOWN (PERFIL)
+   ================================================================== */
+
 .dropdown {
     position: relative;
     display: inline-block;
-    height: 100%; /* Garante altura total na nav */
+    height: 100%;
 }
 
+/* 1. CONFIGURAÇÃO BASE (Válida para todos) */
 .dropdown-content {
-    display: none;
+    display: none; /* Começa Oculto */
     position: absolute;
     right: 0;
-    /* Truque do Buraco: Borda transparente invisível conecta o botão ao menu */
-    border-top: 15px solid transparent; 
-    top: 100%; /* Cola exatamente embaixo do botão */
-    
-    /* O fundo e a sombra agora aplicam no "pseudo-elemento" ou nas tags A, 
-       mas para simplificar, vamos ajustar o background aqui e usar background-clip */
     background-color: var(--card-bg);
-    background-clip: padding-box; /* Faz a cor não vazar na borda transparente */
-    
     min-width: 160px;
     box-shadow: 0 8px 16px rgba(0,0,0,0.5);
     z-index: 100;
     border-radius: 5px;
     border: 1px solid #333;
-    /* REMOVIDO: margin-top: 10px; (Isso que causava o bug) */
+    overflow: hidden;
 }
 
-/* MOSTRAR: Funciona com Hover (Mouse) OU com a classe .show (Clique) */
-.dropdown:hover .dropdown-content, .dropdown-content.show {
-    display: block;
+/* 2. CLASSE SHOW (Ativada pelo JS) - Força aparecer */
+.dropdown-content.show {
+    display: block !important;
 }
 
+/* Estilo dos Links */
 .dropdown-content a {
     color: var(--text-color);
     padding: 12px 16px;
@@ -348,37 +345,77 @@ nav {
     color: var(--primary-color);
 }
 
-/* --- A SETA CHEVRON (< vira ^) --- */
+/* --- SETA (CHEVRON) --- */
 .arrow {
     border: solid white;
-    border-width: 0 2px 2px 0; /* Desenha um L */
+    border-width: 0 2px 2px 0;
     display: inline-block;
     padding: 3px;
     margin-left: 8px;
     margin-bottom: 2px;
-    transition: transform 0.3s ease; /* Animação suave */
-    
-    /* Estado Inicial: Apontando para baixo (45 graus) */
+    transition: transform 0.3s ease;
     transform: rotate(45deg); 
-    -webkit-transform: rotate(45deg);
 }
 
-/* Quando passar o mouse no menu OU quando estiver clicado (.show), a seta gira */
-.dropdown:hover .arrow, .show + .dropdown-content ~ .arrow { 
-    /* Estado Aberto: Apontando para cima */
-    transform: rotate(-135deg);
-    -webkit-transform: rotate(-135deg);
-    margin-bottom: -2px; /* Pequeno ajuste ótico */
+/* ==================================================================
+   REGRAS ESPECÍFICAS: COMPUTADOR (Mouse)
+   ================================================================== */
+@media (min-width: 769px) {
+    /* Só no PC o Hover abre o menu automaticamente */
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+    
+    /* Gira a seta no hover do PC */
+    .dropdown:hover .arrow {
+        transform: rotate(-135deg);
+        margin-bottom: -2px;
+    }
 }
 
-/* Ajuste específico para quando o JS ativa a classe .show na div, precisamos girar a seta no link */
-/* Como o JS não adiciona classe no link, vamos confiar no Hover do CSS para girar,
-   ou podemos adicionar uma linha no JS para girar. 
-   Por enquanto, o hover já vai dar o efeito visual que você quer 99% das vezes. */
+/* ==================================================================
+   REGRAS ESPECÍFICAS: CELULAR (Touch)
+   ================================================================== */
+@media (max-width: 768px) {
+    .dropdown {
+        width: 100%;
+        text-align: center;
+        display: block;
+    }
 
-/* Mostra o menu quando passa o mouse (Desktop) ou clica (Mobile) */
-.dropdown:hover .dropdown-content {
-    display: block;
+    .dropdown-content {
+        position: relative; /* Não flutua, empurra conteúdo */
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        background-color: #1a1a1a;
+        margin-top: 5px;
+        padding: 0;
+        
+        /* IMPORTANTE: Garante que o hover fantasma não abra o menu */
+        display: none; 
+    }
+
+    /* Trava de segurança: Hover no celular NÃO faz nada */
+    .dropdown:hover .dropdown-content {
+        display: none;
+    }
+
+    /* A única forma de aparecer é com a classe .show */
+    .dropdown-content.show {
+        display: block !important;
+        animation: abrirMobile 0.3s ease-out;
+    }
+    
+    .dropdown-content a {
+        padding: 15px;
+        border-bottom: 1px solid #333;
+    }
+    
+    @keyframes abrirMobile {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 }
 
 /* --- ESTILOS DO MODAL (JANELA) --- */
@@ -1211,5 +1248,144 @@ button, a, .tab-btn, .task-card {
     input, select {
         font-size: 16px !important; 
         padding: 15px;
+    }
+}
+
+/* ==================================================
+   CORREÇÃO RESPONSIVA PARA TELAS PEQUENAS (320px+)
+   ================================================== */
+
+@media (max-width: 480px) {
+
+    /* 1. Transforma o card da semana em COLUNA (Um item embaixo do outro) */
+    .task-card-mini {
+        flex-direction: column; /* Empilha verticalmente */
+        align-items: flex-start !important; /* Alinha tudo à esquerda */
+        gap: 8px; /* Espaço entre o nome e os botões */
+        padding: 12px; /* Mais respiro interno */
+        border-left: 4px solid #444; /* Borda lateral para estilo */
+        background-color: #1e1e1e; /* Garante fundo constrastante */
+    }
+
+    /* 2. O nome da tarefa ganha destaque */
+    .task-card-mini > div:first-child {
+        width: 100%;
+        font-weight: bold;
+        font-size: 1rem;
+        margin-bottom: 2px;
+        color: white;
+    }
+
+    /* 3. A linha de baixo (Status + Botões) se espalha */
+    .task-card-mini > div:last-child {
+        width: 100%;
+        display: flex;
+        justify-content: space-between; /* Status na esquerda, Botões na direita */
+        align-items: center;
+        border-top: 1px solid #333; /* Linha sutil separando nome das ações */
+        padding-top: 8px;
+    }
+
+    /* 4. Ajuste dos botões de ação (Lápis e Lixeira) */
+    .task-card-mini .action-buttons {
+        gap: 10px; /* Mais espaço entre lápis e lixeira */
+    }
+
+    .task-card-mini .btn-icon {
+        width: 32px;
+        height: 32px;
+        background-color: #2a2a2a; /* Fundo leve para o botão aparecer mais */
+        border: 1px solid #444;
+    }
+
+    /* 5. Ajuste do cabeçalho do dia (Terça-feira, Quarta...) */
+    .day-header {
+        font-size: 1rem;
+        flex-wrap: wrap; /* Permite quebrar linha se o "HOJE" atrapalhar */
+    }
+
+    .badge-hoje {
+        margin-left: auto; /* Empurra o "HOJE" para a direita */
+    }
+}
+
+/* Mensagem de Dia Concluído (100%) */
+.msg-dia-completo {
+    background-color: rgba(0, 230, 118, 0.15); /* Verde transparente */
+    border: 1px solid #00e676; /* Borda verde neon */
+    color: #00e676;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.95rem;
+    box-shadow: 0 0 10px rgba(0, 230, 118, 0.1); /* Brilho leve */
+    animation: fadeInPage 0.5s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* =========================================
+   ESTÉTICA: TEXTOS COM LETRA MAIÚSCULA
+   ========================================= */
+
+/* Transforma "ler" em "Ler" e "treinar" em "Treinar" */
+.task-card h4,           /* Títulos da aba Hoje */
+.task-card-mini span,    /* Títulos da aba Semana */
+.task-info h4 {          /* Títulos das Recompensas */
+    text-transform: capitalize;
+}
+
+/* Garante que os status (Feito, Pendente) não fiquem estranhos */
+/* Opcional: Se quiser manter o padrão nos status também, o código acima já resolve. 
+   Se quiser forçar algo diferente nos status, adicione regras específicas aqui. */
+
+/* ==================================================
+   CORREÇÃO DO DROPDOWN PERFIL NO CELULAR
+   ================================================== */
+
+@media (max-width: 768px) {
+    
+    /* 1. Remove a posição absoluta (flutuante) */
+    .dropdown-content {
+        position: relative; /* Fica no fluxo normal da página */
+        width: 100%;        /* Ocupa a largura total do menu */
+        box-shadow: none;   /* Remove sombra pois agora está dentro */
+        border: none;       /* Remove borda externa */
+        background-color: #1a1a1a; /* Fundo um pouco mais claro que o menu */
+        margin-top: 10px;   /* Espacinho do botão Perfil */
+        padding: 0px;         /* Zera padding extra */
+        border-radius: 10px;
+        
+        /* Animação de abrir suave (Accordion) */
+        transition: max-height 0.3s ease-out;
+    }
+
+    /* 2. Estiliza os links internos (Conta, Config, Sair) */
+    .dropdown-content a {
+        text-align: center;      /* Centraliza o texto */
+        padding: 15px;           /* Mais fácil de clicar com o dedo */
+        border-bottom: 1px solid #333; /* Linha divisória sutil */
+        color: #ccc;
+    }
+
+    /* 3. Ajuste do botão Sair para ficar centralizado também */
+    .logout-btn {
+        justify-content: center !important; /* Força o ícone e texto pro meio */
+        color: #ff5555 !important;
+    }
+
+    /* 4. Remove a setinha flutuante do topo (aquela borda transparente) */
+    .dropdown-content {
+        border-top: none; 
+    }
+
+    /* 5. Garante que o container do dropdown ocupe a largura toda */
+    .dropdown {
+        width: 100%;
+        text-align: center;
     }
 }

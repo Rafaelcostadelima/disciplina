@@ -30,7 +30,11 @@ if (hamburger && navMenu) {
         navMenu.classList.toggle("active");
     });
     // Fecha ao clicar num link
+    // Fecha ao clicar num link (EXCETO se for o botão de Perfil)
     document.querySelectorAll(".nav-links a").forEach(n => n.addEventListener("click", () => {
+        // Se o link clicado for o "btnPerfil", NÃO fecha o menu, apenas retorna.
+        if (n.id === "btnPerfil") return;
+
         hamburger.classList.remove("active");
         navMenu.classList.remove("active");
     }));
@@ -38,12 +42,20 @@ if (hamburger && navMenu) {
 
 if (btnPerfil && myDropdown) {
     btnPerfil.addEventListener("click", function (e) {
+        // Para o comportamento padrão
         e.preventDefault();
+        e.stopPropagation();
+
+        // O comando mágico: Se tem a classe tira, se não tem coloca.
         myDropdown.classList.toggle("show");
+
         // Gira a setinha
         if (arrowIcon) {
-            arrowIcon.style.transform = myDropdown.classList.contains("show") 
-                ? "rotate(-135deg)" : "rotate(45deg)";
+            if (myDropdown.classList.contains("show")) {
+                arrowIcon.style.transform = "rotate(-135deg)";
+            } else {
+                arrowIcon.style.transform = "rotate(45deg)";
+            }
         }
     });
 }
@@ -285,22 +297,24 @@ function toggleTooltip(element) {
    9. GERENCIADOR DE FECHAMENTO GLOBAL (WINDOW.ONCLICK)
    ------------------------------------------------------------------ */
 // Fecha qualquer modal se clicar fora dela
+/* Substitua o window.onclick final por isto: */
 window.onclick = function (event) {
+    // 1. Fecha Modais se clicar fora
     const modals = [modalMeta, modalImportante, modalGamificacao, modalConfirm, modalDelete, modalRecompensa, modalCompra];
-    
     modals.forEach(m => {
         if (m && event.target == m) m.style.display = "none";
     });
 
-    // Fecha Dropdown Perfil
-    if (btnPerfil && !event.target.closest(".dropdown")) {
-        if (myDropdown && myDropdown.classList.contains("show")) {
+    // 2. Fecha Dropdown Perfil APENAS se clicar FORA dele
+    if (myDropdown && myDropdown.classList.contains("show")) {
+        // Se o clique NÃO foi no dropdown e NEM no botão perfil
+        if (!event.target.closest(".dropdown-content") && !event.target.closest("#btnPerfil")) {
             myDropdown.classList.remove("show");
             if (arrowIcon) arrowIcon.style.transform = "rotate(45deg)";
         }
     }
     
-    // Fecha Tooltip
+    // 3. Fecha Tooltip
     if (!event.target.closest('.help-icon')) {
         document.querySelectorAll('.help-icon.active').forEach(el => el.classList.remove('active'));
     }
