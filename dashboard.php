@@ -28,12 +28,62 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 // 2. Dados do Usuário
-$stmt = $pdo->prepare("SELECT nome, pontos, username FROM usuarios WHERE id = :id");
+$stmt = $pdo->prepare("SELECT nome, pontos, username, xp_total, nivel FROM usuarios WHERE id = :id");
 $stmt->execute([':id' => $_SESSION['usuario_id']]);
 $dados_usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 $nome_usuario = $dados_usuario['nome'];
 $username = $dados_usuario['username'];
 $pontos_totais = $dados_usuario['pontos'];
+$xp_total = $dados_usuario['xp_total'];
+$nivel_atual = $dados_usuario['nivel'];
+
+// --- CÁLCULOS DA BARRA DE PROGRESSO ---
+// (A lógica visual continua a mesma para desenhar a barra)
+$xp_base_nivel_atual = pow($nivel_atual - 1, 2) * 50;
+$xp_para_proximo_nivel = pow($nivel_atual, 2) * 50;
+$xp_no_nivel = $xp_total - $xp_base_nivel_atual;
+$tamanho_do_nivel = $xp_para_proximo_nivel - $xp_base_nivel_atual;
+$porcentagem_xp = 0;
+if ($tamanho_do_nivel > 0) {
+    $porcentagem_xp = ($xp_no_nivel / $tamanho_do_nivel) * 100;
+}
+
+// --- VERIFICA SE SUBIU DE NÍVEL (Sessão) ---
+$exibir_modal_levelup = false;
+$novo_nivel_conquistado = 0;
+
+if (isset($_SESSION['level_up'])) {
+    $exibir_modal_levelup = true;
+    $novo_nivel_conquistado = $_SESSION['level_up'];
+    unset($_SESSION['level_up']); // Limpa para não aparecer de novo ao recarregar
+}
+
+// --- SISTEMA DE NÍVEIS (RPG) ---
+// Fórmula: Nível = RaizQuadrada(XP / 50) + 1
+// Isso cria uma curva onde fica mais difícil subir conforme o nível aumenta.
+
+$nivel_atual = floor(sqrt($xp_total / 50)) + 1;
+if ($nivel_atual > 100)
+    $nivel_atual = 100; // Trava no nível 100
+
+// Cálculos para a Barra de Progresso
+// Quanto XP precisava para chegar NESTE nível?
+$xp_base_nivel_atual = pow($nivel_atual - 1, 2) * 50;
+
+// Quanto XP precisa para o PRÓXIMO nível?
+$xp_para_proximo_nivel = pow($nivel_atual, 2) * 50;
+
+// Quanto XP eu tenho DENTRO deste nível?
+$xp_no_nivel = $xp_total - $xp_base_nivel_atual;
+
+// Qual o tamanho total deste nível (do início ao fim)?
+$tamanho_do_nivel = $xp_para_proximo_nivel - $xp_base_nivel_atual;
+
+// Porcentagem (0 a 100%)
+$porcentagem_xp = 0;
+if ($tamanho_do_nivel > 0) {
+    $porcentagem_xp = ($xp_no_nivel / $tamanho_do_nivel) * 100;
+}
 
 // 3. Buscar Rotinas
 $stmt_rotinas = $pdo->prepare("SELECT * FROM rotinas WHERE usuario_id = :uid ORDER BY id DESC");
@@ -131,10 +181,33 @@ foreach ($todas_rotinas as $rotina) {
                     <h1 style="color: var(--primary-color);">Olá, <?= htmlspecialchars($username); ?>!</h1>
                     <p style="color: var(--text-muted);">Você tem o poder de mudar sua vida.</p>
                 </div>
-                <div class="dt-points-badge">
-                    <div class="coin-icon"></div>
-                    <span class="points-value"><?= $pontos_totais ?></span>
-                    <span class="points-label">DT</span>
+
+                <!-- Container dos Badges -->
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+
+                    <!-- Container dos Status (XP e DT) -->
+                    <div class="stats-container">
+
+                        <!-- BARRA DE NÍVEL (XP) -->
+                        <div class="level-container">
+                            <div class="level-info">
+                                <span class="level-badge">LVL <?= $nivel_atual ?></span>
+                                <span class="xp-text"><?= number_format($xp_no_nivel, 0, ',', '.') ?> /
+                                    <?= number_format($tamanho_do_nivel, 0, ',', '.') ?> XP</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: <?= $porcentagem_xp ?>%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Badge de DT Points (Dinheiro) -->
+                        <div class="dt-points-badge">
+                            <div class="coin-icon"></div>
+                            <span class="points-value"><?= number_format($pontos_totais, 0, ',', '.') ?></span>
+                            <span class="points-label">DT</span>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
@@ -682,6 +755,34 @@ foreach ($todas_rotinas as $rotina) {
             </form>
         </div>
     </div>
+
+    <!-- MODAL LEVEL UP! 🎉 -->
+    <?php if ($exibir_modal_levelup): ?>
+        <div id="modalLevelUp" class="modal" style="display: block;">
+            <div class="modal-content level-up-content">
+                <span class="close-btn"
+                    onclick="document.getElementById('modalLevelUp').style.display='none'">&times;</span>
+
+                <div class="levelup-icon">⭐</div>
+
+                <h2 class="levelup-title">LEVEL UP!</h2>
+                <p style="color: #ddd; margin-bottom: 20px;">Você alcançou um novo patamar de disciplina.</p>
+
+                <div class="levelup-badge">
+                    NÍVEL <?= $novo_nivel_conquistado ?>
+                </div>
+
+                <p style="font-size: 0.9rem; color: #888; margin-top: 20px;">Continue focado. O próximo nível te espera.</p>
+
+                <button class="btn-submit" onclick="document.getElementById('modalLevelUp').style.display='none'"
+                    style="margin-top: 25px; background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); border: none;">CONTINUAR</button>
+            </div>
+        </div>
+        <!-- Som de Level Up (Opcional - Truque simples) -->
+        <audio autoplay>
+            <source src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" type="audio/mpeg">
+        </audio>
+    <?php endif; ?>
 
     <script src="script.js"></script>
     <!-- Script Inline (Celular) -->
